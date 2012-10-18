@@ -1,0 +1,5 @@
+default <%= @id %>
+
+label <%= @id %>
+  kernel /images/<%= @id %>/vmlinuz
+  append ksdevice=eth0 load_ramdisk=1 initrd=/images/<%= @id %>/initrd.img network http_proxy=http://<%= @ipaddr %>:3128 ks=http://<%= @ipaddr %>/ks/<%= @id %>.ks

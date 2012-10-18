@@ -1,0 +1,20 @@
+#!/bin/bash
+case $1 in
+	"clear")
+		export OS_TENANT_NAME=
+		export OS_USERNAME=
+		export OS_PASSWORD=
+		export OS_AUTH_URL=
+		export OS_NO_CACHE=
+		;;
+
+	*)
+		export OS_TENANT_NAME=${1}
+		export OS_USERNAME=${1}
+		export OS_PASSWORD=${1}_passwd
+		export OS_AUTH_URL=http://<%= @control_host %>:35357/v2.0
+		export OS_NO_CACHE=-1
+		;;
+esac
+
+# vim: nu ai ts=4 sw=4

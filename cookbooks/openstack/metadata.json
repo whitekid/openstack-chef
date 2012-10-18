@@ -1,0 +1,30 @@
+{
+  "recommendations": {
+  },
+  "attributes": {
+  },
+  "providing": {
+  },
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "description": "Installs/Configures openstack",
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "replacing": {
+  },
+  "name": "openstack",
+  "conflicting": {
+  },
+  "version": "0.1.0",
+  "maintainer_email": "YOUR_EMAIL",
+  "maintainer": "YOUR_COMPANY_NAME",
+  "suggestions": {
+  },
+  "dependencies": {
+    "mysql": ">= 0.0.0"
+  },
+  "platforms": {
+  },
+  "license": "All rights reserved"
+}

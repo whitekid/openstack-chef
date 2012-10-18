@@ -1,0 +1,88 @@
+---
+# token is the admin_token in keystone.conf
+token:    <%= @admin_token %>
+endpoint: http://<%= @control_host %>:35357/v2.0
+
+default tenant:
+    name:        admin
+    description: Admin Tenant
+
+# This is the admin user
+default user:
+    name:     admin
+    password: <%= @keystone['admin_passwd'] %>
+
+# See: http://docs.openstack.org/essex/openstack-compute/install/content/setting-up-tenants-users-and-roles.html
+service users:
+    - name:     glance
+      password: <%= @keystone['glance_passwd'] %>
+
+    - name:     nova
+      password: <%= @keystone['nova_passwd'] %>
+
+    - name:     ec2
+      password: <%= @keystone['ec2_passwd'] %>
+
+    - name:     swift
+      password: <%= @keystone['swift_passwd'] %>
+
+    - name:     quantum
+      password: <%= @keystone['quantum_passwd'] %>
+
+# See: http://docs.openstack.org/essex/openstack-compute/install/content/keystone-service-endpoint-create.html
+services and endpoints:
+    - name:         keystone
+      type:         identity
+      description:  Keystone Identity Service
+      region:       RegionOne
+      publicurl:    http://<%= @control_host %>:5000/v2.0
+      internalurl:  http://<%= @control_host %>:5000/v2.0
+      adminurl:     http://<%= @control_host %>:35357/v2.0
+
+    - name:         nova
+      type:         compute
+      description:  Nova Compute Service
+      region:       RegionOne
+      publicurl:    http://<%= @control_host %>:8774/v2/%(tenant_id)s
+      internalurl:  http://<%= @control_host %>:8774/v2/%(tenant_id)s
+      adminurl:     http://<%= @control_host %>:8774/v2/%(tenant_id)s
+
+    - name:         volume
+      type:         volume
+      description:  Nova Volume Service
+      region:       RegionOne
+      publicurl:    http://<%= @control_host %>:8776/v1/%(tenant_id)s
+      internalurl:  http://<%= @control_host %>:8776/v1/%(tenant_id)s
+      adminurl:     http://<%= @control_host %>:8776/v1/%(tenant_id)s
+
+    - name:         glance
+      type:         image
+      description:  Glance Image Service
+      region:       RegionOne
+      publicurl:    http://<%= @control_host %>:9292/v1
+      internalurl:  http://<%= @control_host %>:9292/v1
+      adminurl:     http://<%= @control_host %>:9292/v1
+
+    - name:         ec2
+      type:         ec2
+      description:  EC2 Compatibility Layer
+      region:       RegionOne
+      publicurl:    http://<%= @control_host %>:8773/services/Cloud
+      internalurl:  http://<%= @control_host %>:8773/services/Cloud
+      adminurl:     http://<%= @control_host %>:8773/services/Admin
+
+    - name:         swift
+      type:         object-store
+      description:  Swift Object Storage Service
+      region:       RegionOne
+      publicurl:    http://<%= @control_host %>:8888/v1/AUTH_%(tenant_id)s
+      internalurl:  http://<%= @control_host %>:8888/v1/AUTH_%(tenant_id)s
+      adminurl:     http://<%= @control_host %>:8888/v1
+
+    - name:         quantum
+      type:         network
+      description:  OpenStack Networking Service
+      region:       RegionOne
+      publicurl:    http://<%= @control_host %>:9696/
+      internalurl:  http://<%= @control_host %>:9696/
+      adminurl:     http://<%= @control_host %>:9696/

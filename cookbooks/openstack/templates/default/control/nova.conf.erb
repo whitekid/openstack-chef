@@ -1,0 +1,40 @@
+[DEFAULT]
+dhcpbridge_flagfile=/etc/nova/nova.conf
+dhcpbridge=/usr/bin/nova-dhcpbridge
+logdir=/var/log/nova
+state_path=/var/lib/nova
+lock_path=/var/lock/nova
+force_dhcp_release=True
+iscsi_helper=tgtadm
+libvirt_use_virtio_for_bridges=True
+connection_type=libvirt
+root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+verbose=True
+ec2_private_dns_show_ip=True
+api_paste_config=/etc/nova/api-paste.ini
+volumes_path=/var/lib/nova/volumes
+
+sql_connection=<%= @connection %>
+
+auth_strategy=keystone
+compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
+rabbit_host=<%= @control_host %>
+rabbit_password=<%= @rabbit_passwd %>
+
+# quantum
+network_api_class=<%= @network_api_class %>
+quantum_url=http://<%= @control_host %>:9696
+quantum_auth_strategy=keystone
+quantum_admin_tenant_name=<%= @quantum_tenant_name %>
+quantum_admin_username=<%= @quantum_user_name %>
+quantum_admin_password=<%= @quantum_user_passwd %>
+quantum_admin_auth_url=http://<%= @control_host %>:35357/v2.0
+
+[keystone_authtoken]
+auth_host = <%= @control_host %>
+auth_port = 35357
+auth_protocol = http
+auth_uri = http://<%= @control_host %>:5000/
+admin_tenant_name = <%= @service_tenant_name %>
+admin_user = <%= @service_user_name %>
+admin_password = <%= @service_user_passwd %>

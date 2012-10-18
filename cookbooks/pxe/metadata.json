@@ -1,0 +1,32 @@
+{
+  "replacing": {
+  },
+  "providing": {
+  },
+  "license": "All rights reserved",
+  "suggestions": {
+  },
+  "description": "Installs/Configures pxe",
+  "recipes": {
+  },
+  "groupings": {
+  },
+  "conflicting": {
+  },
+  "maintainer_email": "YOUR_EMAIL",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "attributes": {
+  },
+  "platforms": {
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "name": "pxe",
+  "recommendations": {
+  },
+  "version": "0.1.0",
+  "dependencies": {
+    "nfs": ">= 0.0.0",
+    "nginx": ">= 0.0.0",
+    "tftp": ">= 0.0.0"
+  }
+}

@@ -1,0 +1,37 @@
+#!/bin/bash
+function purge() {
+	apt-get purge -y --auto-remove $@
+}
+
+purge keystone
+purge mysql-server mysql-client mysql-common
+purge glance
+purge rabbitmq-server
+purge python-novaclient
+purge libvirt0 open-iscsi
+purge quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent quantum-dhcp-agent quantum-l3-agent openvswitch-switch
+
+rm -rf /etc/keystone
+rm -rf /var/lib/mysql
+rm -rf /etc/mysql
+rm -rf /var/cache/local/preseeding/mysql-server.seed
+rm -rf /etc/glance
+rm -rf /var/lib/glance
+rm -rf /var/lib/quantum
+rm -rf /var/lib/keystone
+rm -rf /etc/quantum
+rm -rf /etc/openvswitch
+rm -rf /etc/apt/sources.list.d/openstack*
+
+rm -rf /var/log/nova
+rm -rf /var/log/quantum
+
+killall dnsmasq
+
+iptables -F
+
+dhclient -r eth1
+ifconfig eth1 0 down
+ifconfig eth2 0 down
+
+apt-get clean all

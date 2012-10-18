@@ -1,0 +1,28 @@
+install
+text
+url --url "http://<%= @ipaddr %>/images/<%= @id %>"
+lang en_US.UTF-8
+keyboard us
+
+network --device eth0 --onboot yes --bootproto dhcp
+
+rootpw --iscrypted $6$QYWP5U5.ukNPGhjP$.mEugKzG4MNTM/6irUjLrYAivX7uWo6uycEzfPY39NN/0TrDQpYmgf26hG4LTwFLMnUeRwPDiIvUj6QTis.6d/
+firewall --enabled --port=22:tcp
+authconfig --enableshadow --enablemd5
+selinux --disabled
+timezone --utc Asia/Seoul
+
+bootloader --location=mbr
+clearpart --all --initlabel
+part /boot --fstype ext4 --size=100 --ondisk=sda
+part pv.4 --size=1 --grow --ondisk=sda
+volgroup VolGroup00 --pesize=32768 pv.4
+logvol swap --fstype swap --name=LogVol01 --vgname=VolGroup00 --size=2048
+logvol / --fstype ext4 --name=LogVol00 --vgname=VolGroup00 --size=5120 --grow
+reboot
+
+%packages
+<%= @packages %>
+
+%post
+<%= @post_script %>

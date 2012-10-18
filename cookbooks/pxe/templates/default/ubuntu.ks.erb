@@ -1,0 +1,27 @@
+lang en_US
+langsupport ko_KR --default=en_US
+keyboard us
+timezone --utc Asia/Seoul
+rootpw --iscrypted $1$AH/VdOiF$du8IT8gRq6edfsp2H.c6M.
+user choe --fullname "Choe, Cheng-Dae" --iscrypted --password $1$1M4sPy.F$ndv8EgkPZQ.vYEqFeqXIq1 --groups=sudo
+reboot
+text
+install
+url --url "http://<%= @ipaddr %>/images/<%= @id %>"
+bootloader --location=mbr
+zerombr yes
+clearpart --all --initlabel
+part swap --size 2048
+part / --fstype ext4 --size 1 --grow
+auth  --useshadow  --enablemd5
+network --bootproto=dhcp --device=eth0
+firewall --disabled
+skipx
+
+%packages
+<%= @packages %>
+
+%pre
+
+%post
+<%= @post_script %>

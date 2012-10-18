@@ -1,0 +1,97 @@
+{
+  "recipes": {
+  },
+  "version": "1.0.0",
+  "conflicting": {
+  },
+  "name": "tftp",
+  "platforms": {
+    "debian": ">= 0.0.0",
+    "ubuntu": ">= 0.0.0"
+  },
+  "maintainer_email": "matt@opscode.com",
+  "long_description": "Description\n===========\nConfigures the Trivial File Transfer Protocol server `tftpd`. This cookbook may be used in conjunction with the `pxe_dust` to create PXE-bootable Ubuntu installs.\n\nRecipes\n=======\n\ndefault\n-------\nThe default recipe passes through to the server recipe.\n\nserver\n------\nThe node will install and use the `tftpd` application to provide files via tftp. Typically those nodes will be requesting images via PXE and configured from their BIOS as clients, so there is not a client recipe yet.\n\nUsage\n=====\nNodes using the `tftp::server` recipe will provide tftp access to whatever files are in their `['tftp']['directory']`.\n\nLicense and Author\n==================\n\nAuthor:: Matt Ray (<matt@opscode.com>)\n\nCopyright 2011-2012 Opscode, Inc.\n\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n    http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n",
+  "replacing": {
+  },
+  "providing": {
+  },
+  "maintainer": "Opscode, Inc.",
+  "suggestions": {
+  },
+  "recommendations": {
+  },
+  "attributes": {
+    "tftp/tftp_options": {
+      "choice": [
+
+      ],
+      "required": "optional",
+      "recipes": [
+
+      ],
+      "type": "string",
+      "display_name": "tftp tftp_options",
+      "default": "--secure",
+      "calculated": false
+    },
+    "tftp/address": {
+      "choice": [
+
+      ],
+      "required": "optional",
+      "recipes": [
+
+      ],
+      "type": "string",
+      "display_name": "tftp address",
+      "default": "0.0.0.0:69",
+      "calculated": false
+    },
+    "tftp/options": {
+      "choice": [
+
+      ],
+      "required": "optional",
+      "recipes": [
+
+      ],
+      "type": "string",
+      "display_name": "tftp options",
+      "default": "-l -s /var/lib/tftpboot",
+      "calculated": false
+    },
+    "tftp/directory": {
+      "choice": [
+
+      ],
+      "required": "optional",
+      "recipes": [
+
+      ],
+      "type": "string",
+      "display_name": "tftp directory",
+      "default": "/var/lib/tftpboot",
+      "description": "Directory to be shared via tftp.",
+      "calculated": false
+    },
+    "tftp/username": {
+      "choice": [
+
+      ],
+      "required": "optional",
+      "recipes": [
+
+      ],
+      "type": "string",
+      "display_name": "tftp user",
+      "default": "tftp",
+      "calculated": false
+    }
+  },
+  "license": "Apache 2.0",
+  "description": "Installs/Configures tftpd",
+  "dependencies": {
+  },
+  "groupings": {
+  }
+}

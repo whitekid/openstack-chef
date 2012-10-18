@@ -1,0 +1,17 @@
+menu title PXE boot menu
+
+<% @items.each do |item| %>
+include pxelinux.cfg/<%= item[:id] %>
+<% end %>
+
+default menu.c32 
+
+# for busybox booting using initrd
+#label stage0
+#    kernel stage0/vmlinuz
+#    append initrd=stage0/initrd.img vga=normal ramdisk_size=16432 ip=dhcp init=/bin/sh
+#
+#label local
+#    MENU LABEL Boot local hard drive
+#    LOCALBOOT 0
+#

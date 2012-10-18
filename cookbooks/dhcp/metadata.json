@@ -1,0 +1,29 @@
+{
+  "recipes": {
+  },
+  "version": "0.1.0",
+  "conflicting": {
+  },
+  "name": "dhcp",
+  "platforms": {
+  },
+  "maintainer_email": "YOUR_EMAIL",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "replacing": {
+  },
+  "providing": {
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "suggestions": {
+  },
+  "recommendations": {
+  },
+  "attributes": {
+  },
+  "license": "All rights reserved",
+  "description": "Installs/Configures dhcp",
+  "dependencies": {
+  },
+  "groupings": {
+  }
+}

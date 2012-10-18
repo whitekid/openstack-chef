@@ -1,0 +1,22 @@
+{
+	"id": "default",
+	"proxy": "http://10.20.1.3:3128",
+	"dbpasswd": {
+		"mysql": "mysql_passwd",
+		"keystone": "keystone_passwd",
+		"glance": "glance_passwd",
+		"nova": "nova_passwd",
+		"quantum": "quantum_passwd"
+	},
+	"control_host": "10.20.1.6",
+	"admin_token": "admin_token",
+	"rabbit_passwd": "guest",
+	"keystone": {
+		"admin_passwd": "admin_passwd",
+		"glance_passwd": "glance_passwd",
+		"nova_passwd": "nova_passwd",
+		"ec2_passwd": "ec2_passwd",
+		"swift_passwd": "swift_passwd",
+		"quantum_passwd": "quantum_passwd"
+	}
+}
