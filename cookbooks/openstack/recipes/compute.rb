@@ -35,23 +35,19 @@ template "/etc/nova/nova.conf" do
 end
 
 # @todo cgroup_devel_acl 수정
-template "/etc/libvirt/qemu.conf" do
-	mode "0644"
-	source "compute/qemu.conf.erb"
-	notifies :restart, "service[libvirt-bin]"
-end
+#template "/etc/libvirt/qemu.conf" do
+#	mode "0644"
+#	source "compute/qemu.conf.erb"
+#	notifies :restart, "service[libvirt-bin]"
+#end
 
-execute "data nic bring up" do
-	command "dhclient eth1"
-	not_if "ifconfig eth1 | grep 'inet addr'"
-end
-
-ruby_block "get data nic ip" do
-	block do
-		node['eth1'] = `ifconfig eth1 | grep 'inet addr' | cut -d : -f 2 | awk '{print $1}'`
-		puts node['eth1']
-	end
-end
+# @note 원래는 이렇게 dhcp로 가져와야 하겠지만, 아래 local_ip 설정하는 부분에서 아이피를 얻으려고 하면 문제가 발생한다
+# 이미 부팅한 상황에서는 큰 문제가 없는데 처음 부팅하여 실행할 때 이상하게 가져오지 못한다.
+# %x(cmd)로 실행하면 resource가 실행하기 전에 실행이 되어버려서 그런 것 같기도 하고... hmm
+#execute "data nic bring up" do
+#	command "dhclient eth1"
+#	not_if "ifconfig eth1 | grep 'inet addr'"
+#end
 
 # setup bridge
 execute "ovs-vsctl -- --may-exist add-br br-int"
@@ -67,7 +63,7 @@ template "/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini" do
 		"enable_tunneling" => true,
 		"tenant_network_type" => 'gre',
 		"tunnel_id_ranges" => '1:1000',
-		"local_ip" => node['eth1'],
+		"local_ip" => %x(until ifconfig eth1 | grep 'inet addr' > /dev/null; do dhclient eth1 > /dev/null; sleep 1; done; ifconfig eth1 | grep 'inet addr' | cut -d : -f 2 | awk '{print $1}'),
 	})
 	notifies :restart, "service[quantum-plugin-openvswitch-agent]"
 end

@@ -13,12 +13,6 @@ execute "data nic bring up" do
 	not_if "ifconfig eth1 | grep 'inet addr'"
 end
 
-ruby_block "get data nic ip" do
-	block do
-		node['eth1'] = `ifconfig eth1 | grep 'inet addr' | cut -d : -f 2 | awk '{print $1}'`
-	end
-end
-
 execute "external nic bring up" do
 	command "ip link set up eth2"
 	not_if "ip addr show eth2 | grep eth2 | grep UP"
@@ -42,6 +36,7 @@ template "/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini" do
 		"tenant_network_type" => 'gre',
 		"tunnel_id_ranges" => '1:1000',
 		"local_ip" => node['eth1'],
+		"local_ip" => %x(until ifconfig eth1 | grep 'inet addr' > /dev/null; do dhclient eth1 > /dev/null; sleep 1; done; ifconfig eth1 | grep 'inet addr' | cut -d : -f 2 | awk '{print $1}'),
 	})
 	notifies :restart, "service[quantum-dhcp-agent]"
 	notifies :restart, "service[quantum-l3-agent]"
