@@ -6,6 +6,7 @@
 		"keystone": "keystone_passwd",
 		"glance": "glance_passwd",
 		"nova": "nova_passwd",
+		"cinder": "cinder_passwd",
 		"quantum": "quantum_passwd"
 	},
 	"control_host": "10.20.1.6",
@@ -17,6 +18,7 @@
 		"nova_passwd": "nova_passwd",
 		"ec2_passwd": "ec2_passwd",
 		"swift_passwd": "swift_passwd",
+		"cinder_passwd": "cinder_passwd",
 		"quantum_passwd": "quantum_passwd"
 	}
 }

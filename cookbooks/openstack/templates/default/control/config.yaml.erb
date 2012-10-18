@@ -26,6 +26,9 @@ service users:
     - name:     swift
       password: <%= @keystone['swift_passwd'] %>
 
+    - name:     cinder
+      password: <%= @keystone['cinder_passwd'] %>
+
     - name:     quantum
       password: <%= @keystone['quantum_passwd'] %>
 
@@ -47,9 +50,17 @@ services and endpoints:
       internalurl:  http://<%= @control_host %>:8774/v2/%(tenant_id)s
       adminurl:     http://<%= @control_host %>:8774/v2/%(tenant_id)s
 
-    - name:         volume
+#    - name:         volume
+#      type:         volume
+#      description:  Nova Volume Service
+#      region:       RegionOne
+#      publicurl:    http://<%= @control_host %>:8776/v1/%(tenant_id)s
+#      internalurl:  http://<%= @control_host %>:8776/v1/%(tenant_id)s
+#      adminurl:     http://<%= @control_host %>:8776/v1/%(tenant_id)s
+
+    - name:         cinder
       type:         volume
-      description:  Nova Volume Service
+      description:  Cinder Service
       region:       RegionOne
       publicurl:    http://<%= @control_host %>:8776/v1/%(tenant_id)s
       internalurl:  http://<%= @control_host %>:8776/v1/%(tenant_id)s

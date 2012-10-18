@@ -1,0 +1,4 @@
+#!/bin/bash
+# clear keystone searvice and database
+mysqladmin -uroot -p<%= @mysql_passwd %> -f drop keystone
+apt-get purge -y --auto-remove keystone

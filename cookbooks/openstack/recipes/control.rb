@@ -1,21 +1,28 @@
 class Chef::Recipe
 	include Helper
 end
-#
-# Keystone
-#
-packages(%w{"keystone"})
-
-services(%w{keystone})
 
 bag = data_bag_item('openstack', 'default')
+#
+# Databases
+#
 node['mysql']['server_debian_password'] = bag['dbpasswd']['mysql']
 node['mysql']['server_root_password']   = bag['dbpasswd']['mysql']
 node['mysql']['server_repl_password']   = bag['dbpasswd']['mysql']
 
 include_recipe "mysql::server"
 
-create_db('keystone', 'keystone', bag['dbpasswd']['keystone'])
+%w{keystone glance nova cinder quantum}.each do | db |
+	create_db(db, db, bag['dbpasswd'][db])
+end
+
+
+#
+# Keystone
+#
+packages(%w{"keystone"})
+
+services(%w{keystone})
 
 connection = connection_string('keystone', 'keystone', bag['dbpasswd']['keystone'])
 template "/etc/keystone/keystone.conf" do
@@ -69,7 +76,6 @@ end
 	end
 end
 
-create_db('glance', 'glance', bag['dbpasswd']['glance'])
 services(%w{glance-api glance-registry})
 
 template "/etc/glance/glance-api-paste.ini" do
@@ -197,9 +203,7 @@ end
 #
 # nova-services
 #
-# @todo 처음 chef로 셋업했을때 정상적으로 동작하지 않는다. 설정이 제대로 반영되지 않는 것으로, 서비스를 재시작하면 된다.
 # @todo nova-compute의 경우는 mysql에 접속하지 못하면 바로 에러를 내고 종료해버린다. 따라서 이 부분이 상당히 압에서 진행해야할 거 같다.
-create_db('nova', 'nova', bag['dbpasswd']['nova'])
 packages(%w{nova-novncproxy novnc nova-api nova-ajax-console-proxy nova-cert nova-consoleauth nova-scheduler})
 package "rabbitmq-server"
 services(%w{nova-api nova-cert nova-consoleauth nova-novncproxy nova-scheduler})
@@ -234,6 +238,9 @@ template "/etc/nova/nova.conf" do
 		"quantum_tenant_name" => "service",
 		"quantum_user_name" => "quantum",
 		"quantum_user_passwd" => bag["keystone"]["quantum_passwd"],
+
+		# @note cinder를 사용하려면 nova-api에서 서비스하는 volume을 제거해야함
+		"enabled_apis" => "ec2,osapi_compute,metadata",
 	})
 
 	notifies :run, "bash[nova db sync]", :immediately
@@ -286,7 +293,6 @@ end
 #
 packages(%w{quantum-server quantum-plugin-openvswitch})
 services(%w{quantum-server})
-create_db('quantum', 'quantum', bag['dbpasswd']['quantum'])
 connection = connection_string('quantum', 'quantum', bag['dbpasswd']['quantum'])
 template "/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini" do
 	mode "0644"
@@ -332,10 +338,71 @@ template "/etc/quantum/api-paste.ini" do
 end
 
 #
+# cinder
+#
+# @todo /dev/loop0가 이미 사용 되었을 수도 있음..
+packages(%w{tgt lvm2})
+
+# backing file for volume
+bash "create backing file" do
+	code <<-EOF
+	BACKING=/var/lib/cinder-volumes
+	DEV=/dev/loop0
+
+	truncate --size 100G $BACKING
+	losetup $DEV $BACKING
+	pvcreate $DEV
+	vgcreate cinder-volumes $DEV
+	EOF
+	not_if "vgscan | grep cinder-volumes"
+end
+
+packages(%w{cinder-api cinder-scheduler cinder-volume})
+services(%w{cinder-api cinder-scheduler cinder-volume})
+
+template "/etc/cinder/api-paste.ini" do
+	mode "0644"
+	owner "cinder"
+	group "cinder"
+	source "control/cinder_api-paste.ini.erb"
+	variables({
+		"control_host" => bag["control_host"],
+		"service_tenant_name" => 'service',
+		"service_user_name" => 'cinder',
+		"service_user_passwd" => bag['keystone']['cinder_passwd'],
+		"cinder_port" => 6000,
+	})
+	notifies :restart, "service[cinder-api]"
+end
+
+connection = connection_string('cinder', 'cinder', bag['dbpasswd']['cinder'])
+template "/etc/cinder/cinder.conf" do
+	mode "0644"
+	owner "cinder"
+	group "cinder"
+	source "control/cinder.conf.erb"
+	variables({
+		"connection" => connection,
+		"control_host" => bag['control_host'],
+		"rabbit_passwd" => bag['rabbit_passwd'],
+		"rabbit_userid" => 'guest',
+	})
+	notifies :restart, "service[cinder-api]"
+	notifies :restart, "service[cinder-scheduler]"
+	notifies :restart, "service[cinder-volume]"
+end
+
+execute "cinder db sync" do
+	command "cinder-manage db sync"
+	only_if "test $(mysql -ucinder -p#{bag['dbpasswd']['cinder']} -h#{bag['control_host']} cinder -e 'show tables' | wc -l) = '0'"
+end
+
+#
 # Dashboard
 #
 packages(%w{openstack-dashboard})
 services(%w{apache2})
+
 template "/etc/openstack-dashboard/local_settings.py" do
 	mode "0644"
 	source "control/dashboard_local_settings.py.erb"
@@ -352,8 +419,16 @@ end
 # utility scripts
 #
 cookbook_file "/root/bin/vm_create.sh" do
-	mode "0755"
+	mode "0700"
 	source "vm_create.sh"
 end
 
+template "/root/bin/keystone_clear.sh" do
+	mode "0700"
+	source "control/keystone_clear.sh.erb"
+
+	variables({
+		"mysql_passwd" => bag['dbpasswd']['mysql'],
+	})
+end
 # vim: nu ai ts=4 sw=4

@@ -1,6 +1,7 @@
 #!/bin/bash
 # @todo keypair를 생성하고 등록하기
 # @todo 부팅하면서 메타데이터 서버에 접속하는데 timeout나는 문제
+# @todo cinder support
 IMAGE=${IMAGE:-cirros-0.3.0-x86_64}
 
 function get_id() {

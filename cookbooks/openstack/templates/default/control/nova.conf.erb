@@ -30,6 +30,12 @@ quantum_admin_username=<%= @quantum_user_name %>
 quantum_admin_password=<%= @quantum_user_passwd %>
 quantum_admin_auth_url=http://<%= @control_host %>:35357/v2.0
 
+# cinder
+volume_api_class=nova.volume.cinder.API
+
+#
+enabled_apis=<%= @enabled_apis %>
+
 [keystone_authtoken]
 auth_host = <%= @control_host %>
 auth_port = 35357
@@ -38,3 +44,4 @@ auth_uri = http://<%= @control_host %>:5000/
 admin_tenant_name = <%= @service_tenant_name %>
 admin_user = <%= @service_user_name %>
 admin_password = <%= @service_user_passwd %>
+

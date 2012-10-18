@@ -10,6 +10,7 @@ purge rabbitmq-server
 purge python-novaclient
 purge libvirt0 open-iscsi
 purge quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent quantum-dhcp-agent quantum-l3-agent openvswitch-switch
+purge cinder-api cinder-volume cinder-scheduler python-cinderclient tgt
 
 rm -rf /etc/keystone
 rm -rf /var/lib/mysql
@@ -17,11 +18,16 @@ rm -rf /etc/mysql
 rm -rf /var/cache/local/preseeding/mysql-server.seed
 rm -rf /etc/glance
 rm -rf /var/lib/glance
+rm -rf /var/cache/*.img
 rm -rf /var/lib/quantum
 rm -rf /var/lib/keystone
 rm -rf /etc/quantum
 rm -rf /etc/openvswitch
 rm -rf /etc/apt/sources.list.d/openstack*
+rm -rf /etc/cinder
+losetup -d /dev/loop0
+rm -rf /var/lib/cinder
+rm -rf /var/lib/cinder-volumes
 
 rm -rf /var/log/nova
 rm -rf /var/log/quantum
@@ -33,5 +39,6 @@ iptables -F
 dhclient -r eth1
 ifconfig eth1 0 down
 ifconfig eth2 0 down
+ip netns | xargs -L1 ip netns delete
 
 apt-get clean all
