@@ -267,7 +267,7 @@ template "/etc/nova/api-paste.ini" do
 end
 
 execute "wait for nova-api service startup" do
-	command "timeout 5 sh -c 'until wget http://#{bag['control_host']}:8776/ -O /dev/null -q; do sleep 1; done'"
+	command "timeout 5 sh -c 'until wget http://#{bag['control_host']}:8774/ -O /dev/null -q; do sleep 1; done'"
 end
 
 # security group
