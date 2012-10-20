@@ -170,12 +170,18 @@ images = [
 		"url" => "#{pxe}/cloud-images/cirros-0.3.0-x86_64-disk.img",
 		"checksum" => "50bdc35edb03a38d91b1b071afb20a3c",
 	},
-	# Ubuntu cloud image
+	# Ubuntu 12.04 cloud image
 	{
 		"name" => 'ubuntu-12.04-server-cloudimg-amd64',
 		#"url" => "http://uec-images.ubuntu.com/releases/precise/release-20121001/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
-		"url" => "#{pxe}/cloud-images/precise-server-cloudimg-amd64-disk1.img",
+		"url" => "#{pxe}/cloud-images/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
 		"checksum" => "030a4451f5968ee26d3d75b7759e0d8c",
+	},
+	# Ubuntu 12.10 cloud image
+	{
+		"name" => 'ubuntu-12.10-server-cloudimg-amd64',
+		"url" => "#{pxe}/cloud-images/ubuntu-12.10-server-cloudimg-amd64-disk1.img",
+		"checksum" => "ba66e7e4f7eb9967fe044c808e92700a",
 	},
 ]
 
@@ -192,7 +198,7 @@ images.each do |image|
 		export OS_USERNAME=admin
 		export OS_PASSWORD=#{bag['keystone']['admin_passwd']}
 		export OS_AUTH_URL=http://#{bag["control_host"]}:35357/v2.0 add
-		glance add name=#{image['name']} disk_format=qcow2 container_format=bare < #{local_file}
+		glance add name=#{image['name']} disk_format=qcow2 container_format=bare is_public=true < #{local_file}
 		EOF
 
 		not_if "glance --os-tenant-name=admin --os-username=admin --os-password=#{bag['keystone']['admin_passwd']} --os-auth-url=http://#{bag["control_host"]}:35357/v2.0 image-list | grep ' #{image['name']} '"
