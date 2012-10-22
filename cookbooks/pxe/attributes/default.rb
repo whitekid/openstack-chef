@@ -54,4 +54,16 @@ get -O /etc/dhclient-enter-hooks http://#{node[:ipaddress]}/files/sethostname.sh
 echo 'proxy=http://#{node[:ipaddress]}:3128' >> /etc/yum.conf",
 	},
 ]
+
+
+# pxe 서버가 연결되는 네트워크 설정
+node['pxe']['interfaces'] = [
+	['eth1', '10.30.1.3'],
+	['eth2', '10.30.2.3'],
+	['eth3', '10.40.1.3'],
+	['eth4', '10.130.1.3'],
+	['eth5', '10.130.2.3'],
+	['eth6', '10.140.1.3'],
+]
+
 # vim: ts=4 sw=4 nu sw=4 ai

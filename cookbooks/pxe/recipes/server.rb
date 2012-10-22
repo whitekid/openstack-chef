@@ -135,14 +135,7 @@ http://uec-images.ubuntu.com/releases/precise/release-20121001/ubuntu-12.04-serv
 end
 
 # interfaces to listen pxe boot
-[
-	['eth1', '10.30.1.3'],
-	['eth2', '10.30.2.3'],
-	['eth3', '10.40.1.3'],
-	['eth4', '10.130.1.3'],
-	['eth5', '10.130.2.3'],
-	['eth6', '10.140.1.3'],
-].each do | x |
+node['pxe']['interfaces'].each do | x |
 	ifconfig x[1] do
 		device x[0]
 		mask '255.255.255.0'
