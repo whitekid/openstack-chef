@@ -101,9 +101,20 @@ template "/etc/quantum/l3_agent.ini" do
 		"service_tenant_name" => 'service',
 		"service_user_name" => 'quantum',
 		"service_user_passwd" => bag['keystone']['quantum_passwd'],
-		"use_namespaces" => "True",
+		"use_namespaces" => node['openstack']['use_namespaces'],
 	})
 	notifies :restart, "service[quantum-l3-agent]"
+end
+
+template "/etc/quantum/dhcp_agent.ini" do
+	mode "0644"
+	owner "quantum"
+	group "quantum"
+	source "network/dhcp_agent.ini.erb"
+	variables({
+		"use_namespaces" => node['openstack']['use_namespaces'],
+	})
+	notifies :restart, "service[quantum-dhcp-agent]"
 end
 
 #

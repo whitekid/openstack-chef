@@ -12,6 +12,12 @@ function get_field() {
 	echo x
 }
 
+if [ -z "$OS_TENANT_NAME" ];
+	echo "openstack environ variables is not set"
+	echo "please run . ~/openrc tenant_name"
+	exit
+fi
+
 TENANT_ID=$(keystone tenant-list | grep " $OS_TENANT_NAME " | awk '{print $2}')
 PRINET="${OS_TENANT_NAME}"
 EXTNET="ext_net"

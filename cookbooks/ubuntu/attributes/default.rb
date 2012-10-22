@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+# @todo move settings to data_bag
 case platform
 when "ubuntu"
   set[:ubuntu][:archive_url]  = "http://ftp.daum.net/ubuntu"

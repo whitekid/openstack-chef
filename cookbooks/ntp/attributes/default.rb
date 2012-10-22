@@ -20,7 +20,7 @@
 #
 
 # default attributes for all platforms
-default['ntp']['servers']   = %w{ 0.kr.pool.ntp.org 1.kr.pool.ntp.org 2.kr.pool.ntp.org 3.kr.pool.ntp.org }
+default['ntp']['servers']   = %w{0.kr.pool.ntp.org 1.kr.pool.ntp.org 2.kr.pool.ntp.org 3.kr.pool.ntp.org}
 default['ntp']['peers'] = Array.new
 default['ntp']['restrictions'] = Array.new
 

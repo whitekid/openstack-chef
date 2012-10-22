@@ -14,7 +14,6 @@ wwwroot='/var/www'
 	end
 end
 
-# TODO: pxelinux.cfg/default 만들기
 template "#{config_dir}/default" do
 	source "pxe_default.cfg.erb"
 	mode "0755"
@@ -159,5 +158,5 @@ template "/etc/exports" do
 	source "exports.erb"
 	notifies :restart, resources(:service => node['nfs']['service']['server'])
 end
-	#mode "0644"
+
 # vim: ts=4 nu sw=4 ai
