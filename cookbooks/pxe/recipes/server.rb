@@ -25,6 +25,7 @@ end
 
 eth0 = node["network"]["interfaces"]["eth0"]["addresses"].select { |address, data| data["family"] == "inet" }[0][0]
 
+# @todo md5sum for iso images
 node[:pxe][:items].each do |item|
 	# install from netboot
 	# netboot 파일을 다운받아서 하면 CD 이미지와 커널 모듈 버전이 안맞는다고 나온다.

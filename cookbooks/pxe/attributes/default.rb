@@ -31,12 +31,13 @@ default['pxe']['items'] = [
 		"packages" => default['pxe']['common'][:packages],
 		"post_script" => default['pxe']['common']["post_script"],
 	},
+	# 12.04는 현재 pxeboot가 정상 작동하지 않고 있다.
 	{
-		"id" => "ubuntu-12.10-beta2-amd64",
+		"id" => "ubuntu-12.10-amd64",
 		"platform" => "ubuntu",
 		"arch" => "amd64",
-		"cdimage" => "#{mirrors['ubuntu']}/12.10/ubuntu-12.10-beta2-server-amd64.iso",
-		'md5sum' => '3f17039f5265e08af377cd8413c77be4',
+		"cdimage" => "#{mirrors['ubuntu']}/12.10/ubuntu-12.10-server-amd64.iso",
+		'md5sum' => '4bd3270bde86d7e4e017e3847a4af485',
 		"packages" => default['pxe']['common'][:packages],
 		"post_script" => default['pxe']['common']["post_script"],
 	},
