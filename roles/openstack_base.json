@@ -1,0 +1,19 @@
+{
+  "json_class": "Chef::Role",
+  "name": "openstack_base",
+  "env_run_lists": {
+  },
+  "chef_type": "role",
+  "description": "",
+  "override_attributes": {
+  },
+  "run_list": [
+    "recipe[ubuntu]",
+    "recipe[ntp]",
+    "recipe[apt]",
+    "recipe[ubuntu::apt-proxy]",
+    "recipe[openstack]"
+  ],
+  "default_attributes": {
+  }
+}

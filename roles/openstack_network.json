@@ -1,0 +1,16 @@
+{
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "name": "openstack_network",
+  "override_attributes": {
+  },
+  "default_attributes": {
+  },
+  "env_run_lists": {
+  },
+  "description": "",
+  "run_list": [
+    "role[openstack_base]",
+    "recipe[openstack::network]"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "env_run_lists": {
+  },
+  "json_class": "Chef::Role",
+  "description": "",
+  "chef_type": "role",
+  "override_attributes": {
+  },
+  "name": "openstack_compute",
+  "run_list": [
+    "role[openstack_base]",
+    "recipe[openstack::compute]"
+  ],
+  "default_attributes": {
+  }
+}

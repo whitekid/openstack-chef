@@ -1,0 +1,22 @@
+{
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "env_run_lists": {
+  },
+  "run_list": [
+    "recipe[ubuntu]",
+    "recipe[ntp]",
+    "recipe[dhcp]",
+    "recipe[nfs]",
+    "recipe[nginx]",
+    "recipe[squid]",
+    "recipe[tftp]",
+    "recipe[pxe]"
+  ],
+  "override_attributes": {
+  },
+  "default_attributes": {
+  },
+  "description": "",
+  "name": "pxe"
+}
