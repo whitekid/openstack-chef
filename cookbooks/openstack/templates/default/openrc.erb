@@ -1,4 +1,9 @@
 #!/bin/bash
+if [ -z "$1" ]; then
+	echo "Usage: openrc tenant_name"
+	return
+fi
+
 case $1 in
 	"clear")
 		export OS_TENANT_NAME=
