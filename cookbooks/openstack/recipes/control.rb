@@ -277,6 +277,9 @@ execute "wait for nova-api service startup" do
 end
 
 # security group
+# @note with quantum's overlapping_ip then nova security group does'nt work correctly.
+# becase nova assumes that vm's IP address are unique
+# http://docs.openstack.org/trunk/openstack-network/admin/content/ch_limitations.html
 bash "set default security group" do
 	code <<-EOF
 	export OS_TENANT_NAME=admin

@@ -8,6 +8,7 @@ services(%w{openvswitch-switch quantum-dhcp-agent quantum-l3-agent quantum-plugi
 bag = data_bag_item('openstack', 'default')
 
 # setup interface
+# @todo eth1의 address를 bridge로 설정해야하는데...
 execute "data nic bring up" do
 	command "dhclient eth1"
 	not_if "ifconfig eth1 | grep 'inet addr'"

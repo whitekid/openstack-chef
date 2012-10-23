@@ -1,5 +1,4 @@
 #!/bin/bash
-# @todo keypair를 생성하고 등록하기
 # @todo 부팅하면서 메타데이터 서버에 접속하는데 timeout나는 문제
 # @todo cinder support
 IMAGE=${IMAGE:-cirros-0.3.0-x86_64}
@@ -12,7 +11,7 @@ function get_field() {
 	echo x
 }
 
-if [ -z "$OS_TENANT_NAME" ];
+if [ -z "$OS_TENANT_NAME" ]; then
 	echo "openstack environ variables is not set"
 	echo "please run . ~/openrc tenant_name"
 	exit
@@ -94,13 +93,23 @@ quantum router-interface-add $ROUTER_ID $SUBNET_ID
 quantum router-gateway-set $ROUTER_ID $EXTNET_ID
 
 #
+# generate keypair
+# default keypair name is ${OS_TENANT_NAME}_key
+#
+KEYNAME="${OS_TENANT_NAME}_key"
+if ! nova keypair-list | grep " ${KEYNAME} " > /dev/null ; then
+	nova keypair-add ${KEYNAME} > ${OS_TENANT_NAME}.key
+fi
+
+
+#
 # boot instance
 #
 if [ ! -z "$VM" ]; then
 	IMAGE_ID=$(nova image-list | grep " $IMAGE " | head -n 1 | awk '{print $2}')
 	echo "IMAGE=$IMAGE_ID"
 
-	VM_ID=$(nova boot --image=$IMAGE_ID --flavor=1 --nic net-id=$NET_ID $VM | awk '/ id /{print $4}')
+	VM_ID=$(nova boot --image=$IMAGE_ID --flavor=1 --nic net-id=$NET_ID --key_name= ${KEYNAME} $VM | awk '/ id /{print $4}')
 	echo "VM=$VM_ID"
 
 	nova show $VM_ID
