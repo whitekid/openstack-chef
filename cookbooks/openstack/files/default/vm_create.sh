@@ -1,4 +1,5 @@
 #!/bin/bash
+# @todo keypair를 생성하고 등록하기
 # @todo 부팅하면서 메타데이터 서버에 접속하는데 timeout나는 문제
 # @todo cinder support
 IMAGE=${IMAGE:-cirros-0.3.0-x86_64}
@@ -111,6 +112,21 @@ if [ ! -z "$VM" ]; then
 
 	VM_ID=$(nova boot --image=$IMAGE_ID --flavor=1 --nic net-id=$NET_ID --key_name=${KEYNAME} $VM | awk '/ id /{print $4}')
 	echo "VM=$VM_ID"
+
+	# get port id for floatingip
+	# wait for settle port
+	while [ -z "$PORT_ID" ]; do
+		PORT_ID=$(quantum port-list -- --device_id=$VM_ID | awk '/ip_address/{ print $2 }')
+		sleep 1
+	done
+	echo "PORT=$PORT_ID"
+
+	# create floating ip
+	FLOATINGIP_ID=$(quantum floatingip-create $EXTNET | awk '/ id /{ print $4 }')
+	echo "FLOATINGIP_ID=$FLOATINGIP_ID"
+
+	# associate floating ip
+	quantum floatingip-associate $FLOATINGIP_ID $PORT_ID
 
 	nova show $VM_ID
 fi
