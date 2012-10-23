@@ -109,7 +109,7 @@ if [ ! -z "$VM" ]; then
 	IMAGE_ID=$(nova image-list | grep " $IMAGE " | head -n 1 | awk '{print $2}')
 	echo "IMAGE=$IMAGE_ID"
 
-	VM_ID=$(nova boot --image=$IMAGE_ID --flavor=1 --nic net-id=$NET_ID --key_name= ${KEYNAME} $VM | awk '/ id /{print $4}')
+	VM_ID=$(nova boot --image=$IMAGE_ID --flavor=1 --nic net-id=$NET_ID --key_name=${KEYNAME} $VM | awk '/ id /{print $4}')
 	echo "VM=$VM_ID"
 
 	nova show $VM_ID
