@@ -6,9 +6,9 @@ bag = data_bag_item('openstack', 'default')
 #
 # Databases
 #
-node['mysql']['server_debian_password'] = bag['dbpasswd']['mysql']
-node['mysql']['server_root_password']   = bag['dbpasswd']['mysql']
-node['mysql']['server_repl_password']   = bag['dbpasswd']['mysql']
+node.set['mysql']['server_debian_password'] = bag['dbpasswd']['mysql']
+node.set['mysql']['server_root_password']   = bag['dbpasswd']['mysql']
+node.set['mysql']['server_repl_password']   = bag['dbpasswd']['mysql']
 
 include_recipe "mysql::server"
 

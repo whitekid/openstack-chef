@@ -1,4 +1,4 @@
-node['openstack'] = {
+node.set['openstack'] = {
 	# Quantum
 	"allow_overlapping_ips" => 'True',
 	"use_namespaces" => 'True',

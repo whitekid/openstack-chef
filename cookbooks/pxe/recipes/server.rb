@@ -23,14 +23,12 @@ template "#{config_dir}/default" do
 end
 
 eth0 = node["network"]["interfaces"]["eth0"]["addresses"].select { |address, data| data["family"] == "inet" }[0][0]
+bag = data_bag_item('hosts', 'default')
 
-# @todo md5sum for iso images
 node[:pxe][:items].each do |item|
-	# install from netboot
 	# netboot 파일을 다운받아서 하면 CD 이미지와 커널 모듈 버전이 안맞는다고 나온다.
 	# 따라서 CD의 netboot 이미지를 가지고 설정한다.
 	pxe_image_dir = "#{node[:tftp][:directory]}/images/#{item[:id]}"
-	install_image_dir = "#{wwwroot}/images/#{item[:id]}"
 
 	directory pxe_image_dir do
 		recursive true
@@ -43,47 +41,12 @@ node[:pxe][:items].each do |item|
 		variables({
 			:id => item["id"],
 			:arch => item["arch"],
-			:ipaddr => eth0,
+			:ipaddr => bag['properties']['pxe_image_host'],
 		})
 	end
 
-	## kickstart
-	directory "#{wwwroot}/ks/"
-	template "#{wwwroot}/ks/#{item[:id]}.ks" do
-		source "#{item[:platform]}.ks.erb"
-		mode "0644"
-		variables({
-			:id => item[:id],
-			:ipaddr => eth0,
-			:packages => item[:packages],
-			:post_script => item[:post_script]
-		})
-	end
-
-	# CDImage Download
-	local_file="/var/cache/#{item[:id]}.iso"
-	bash "download iso file: #{item[:cdimage]}" do
-		code <<-EOH
-		wget -O #{local_file} -nv #{item[:cdimage]}
-		EOH
-		not_if { File.exists?(local_file) }
-	end
-
-	directory install_image_dir do
-		recursive true
-	end
-
-	package "fuseiso"
-
-	# mount cd
-	mount install_image_dir do
-		device local_file
-		fstype "fuse.fuseiso"
-		options "allow_other"
-		not_if "mount | grep fuseiso | grep '#{item[:id]} '"
-	end
-
-	## copy pxe installer
+	## copy pxe installer from image
+	# @todo copy from image server
 	case item[:platform]
 	when 'ubuntu'
 		files = %w{ linux initrd.gz }
@@ -95,11 +58,13 @@ node[:pxe][:items].each do |item|
 	end
 
 	files.each do |f|
-		if File.exists?("#{install_image_dir}/#{dir}/#{f}")
-			File "#{pxe_image_dir}/#{f}" do
-				content IO.read("#{install_image_dir}/#{dir}/#{f}")
-				action :create_if_missing
-			end
+		# @note remote_file로 가져오는게 이상한데?
+		#remote_file "#{pxe_image_dir}/#{f}" do
+		#	source = "http://#{bag[:pxe_image_host]}/images/#{item[:id]}/#{dir}/#{f}"
+		#	puts "hahaha #{source}"
+		#end
+		execute "#{pxe_image_dir}/#{f}" do
+			command "wget -c -O #{pxe_image_dir}/#{f} http://#{bag['properties']['pxe_image_host']}/images/#{item[:id]}/#{dir}/#{f}"
 		end
 	end
 end
@@ -116,47 +81,6 @@ data_bag_item('hosts', 'default')['subnets'].each do |subnet|
 			not_if { host["os"].nil? }
 		end
 	end
-end
-
-#
-# predownload cloud-images for cache
-#
-directory "#{wwwroot}/cloud-images"
-%w{https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
-http://uec-images.ubuntu.com/releases/precise/release-20121001/ubuntu-12.04-server-cloudimg-amd64-disk1.img}.each do |image|
-	local_file = "#{wwwroot}/cloud-images/#{File.basename(image)}"
-	puts local_file
-
-	execute "download cloudimage #{image}" do
-		command "wget -c -O #{local_file} #{image}"
-		not_if { File.exist?(local_file) }
-	end
-end
-
-# interfaces to listen pxe boot
-node['pxe']['interfaces'].each do | x |
-	ifconfig x[1] do
-		device x[0]
-		mask '255.255.255.0'
-	end
-end
-
-#
-# nfs-server 설정: 임시로...
-#
-include_recipe "nfs::server"
-
-# 개발용 캐쉬라구요..
-%w{git_cache pip_cache}.each do |path|
-	directory "/nfs/#{path}" do
-		recursive true
-		mode "0777"
-	end
-end
-
-template "/etc/exports" do
-	source "exports.erb"
-	notifies :restart, resources(:service => node['nfs']['service']['server'])
 end
 
 # vim: ts=4 nu sw=4 ai
