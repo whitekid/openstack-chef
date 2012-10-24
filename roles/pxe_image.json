@@ -1,0 +1,19 @@
+{
+  "env_run_lists": {
+  },
+  "description": "",
+  "default_attributes": {
+  },
+  "name": "pxe_image",
+  "run_list": [
+    "recipe[ubuntu]",
+    "recipe[ntp]",
+    "recipe[nginx]",
+    "recipe[squid]",
+    "recipe[pxe::image]"
+  ],
+  "chef_type": "role",
+  "override_attributes": {
+  },
+  "json_class": "Chef::Role"
+}

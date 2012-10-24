@@ -9,7 +9,7 @@ pkg_mirror['ubuntu'] = 'ftp.daum.net'
 
 # Setup ISO mirrors
 iso_mirrors = {
-	'ubuntu' => "http://192.168.100.108:8080/ubuntu-releases",
+	'ubuntu' => "http://192.168.100.108:8080/ubuntu-cd",
 	'centos' => "http://192.168.100.108:8080/centos",
 }
 

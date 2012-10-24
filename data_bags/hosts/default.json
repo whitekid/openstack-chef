@@ -18,10 +18,7 @@
 			"range":		"10.20.1.20 10.20.1.49",
 			"next-server":	"10.20.1.2",
 			"hosts": [
-				{ "hostname": "control",		"mac": "00:50:56:30:1C:F4",	"ip": "10.20.1.6",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "centos-sandbox",	"mac": "00:0C:29:DE:12:0E",	"ip": "10.20.1.51",	"os": "centos-6.3-x86_64" },
-				{ "hostname": "ubuntu-sandbox",	"mac": "00:0C:29:97:D4:E1",	"ip": "10.20.1.61",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "ubuntu-sandbox-dev",	"mac": "00:0C:29:65:96:63",	"ip": "10.20.1.71",	"os": "ubuntu-12.04-amd64" }
+				{ "hostname": "control",		"mac": "00:0c:29:c6:7e:4f",	"ip": "10.20.1.6",	"os": "ubuntu-12.04-amd64" }
 			]
 		},
 		{
@@ -33,11 +30,9 @@
 			"range":		"10.30.1.20 10.30.1.49",
 			"next-server":	"10.30.1.2",
 			"hosts": [
-				{ "hostname": "network",	"mac": "00:50:56:3E:83:56",	"ip": "10.30.1.5",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-01-01",	"mac": "00:50:56:32:72:BE",	"ip": "10.30.1.20",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-01-02",	"mac": "00:50:56:29:03:87",	"ip": "10.30.1.21",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-02-01",	"mac": "00:50:56:22:4E:F8",	"ip": "10.30.1.22",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-02-02",	"mac": "00:50:56:31:18:DD",	"ip": "10.30.1.23",	"os": "ubuntu-12.04-amd64" }
+				{ "hostname": "network",	"mac": "00:0c:29:ca:d1:60",	"ip": "10.30.1.5",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "c-01-01",	"mac": "00:0c:29:ec:ad:58",	"ip": "10.30.1.20",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "c-01-02",	"mac": "00:0c:29:53:53:f3",	"ip": "10.30.1.21",	"os": "ubuntu-12.04-amd64" }
 			]
 		},
 		{
@@ -47,11 +42,9 @@
 			"netmask":		"255.255.255.0",
 			"range":		"10.130.1.20 10.130.1.49",
 			"hosts": [
-				{ "hostname": "network-data",	"mac": "00:0c:29:25:37:64",	"ip": "10.130.1.5",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-01-01-data",	"mac": "00:0c:29:41:74:97",	"ip": "10.130.1.20",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-01-02-data",	"mac": "00:0c:29:b0:25:74",	"ip": "10.130.1.21",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-02-01-data",	"mac": "00:0c:29:bb:57:3b",	"ip": "10.130.1.22",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-02-02-data",	"mac": "00:0c:29:10:fc:61",	"ip": "10.130.1.23",	"os": "ubuntu-12.04-amd64" }
+				{ "hostname": "network-data",	"mac": "00:0c:29:ca:d1:6a",	"ip": "10.130.1.5",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "c-01-01-data",	"mac": "00:0c:29:ec:ad:62",	"ip": "10.130.1.20",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "c-01-02-data",	"mac": "00:0c:29:53:53:fd",	"ip": "10.130.1.21",	"os": "ubuntu-12.04-amd64" }
 			]
 		}
 	]
