@@ -1,5 +1,7 @@
 module Helper
+	# mysql helper functions
 	def create_db(dbname, dbuser, dbpass)
+		package "mysql-client"
 		bash "create database #{dbname}" do
 			rootpw = data_bag_item('openstack', 'default')['dbpasswd']['mysql']
 			code <<-EOF
@@ -12,7 +14,7 @@ module Helper
 
 	def connection_string(dbname, dbuser, dbpass)
 		bag = data_bag_item('openstack', 'default')
-		return "mysql://#{dbuser}:#{dbpass}@#{bag["control_host"]}/#{dbname}?charset=utf8"
+		return "mysql://#{dbuser}:#{dbpass}@#{bag["mysql_host"]}/#{dbname}?charset=utf8"
 	end
 
 	def services(svcs)

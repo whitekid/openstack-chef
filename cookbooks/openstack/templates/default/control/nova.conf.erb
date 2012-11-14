@@ -18,7 +18,7 @@ sql_connection=<%= @connection %>
 
 auth_strategy=keystone
 compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
-rabbit_host=<%= @control_host %>
+rabbit_host=<%= @rabbit_host %>
 rabbit_password=<%= @rabbit_passwd %>
 
 # quantum
@@ -35,6 +35,9 @@ volume_api_class=nova.volume.cinder.API
 
 #
 enabled_apis=<%= @enabled_apis %>
+
+# for allow_overlapping_ip metadata proxy
+use_forwarded_for=true
 
 [keystone_authtoken]
 auth_host = <%= @control_host %>

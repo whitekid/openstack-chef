@@ -65,6 +65,7 @@ node[:pxe][:items].each do |item|
 		#end
 		execute "#{pxe_image_dir}/#{f}" do
 			command "wget -c -O #{pxe_image_dir}/#{f} http://#{bag['properties']['pxe_image_host']}/images/#{item[:id]}/#{dir}/#{f}"
+			only_if "ping #{bag['properties']['pxe_image_host']} -c 1"
 		end
 	end
 end

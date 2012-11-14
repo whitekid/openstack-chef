@@ -1,16 +1,16 @@
 #!/bin/bash
-# @todo keypair를 생성하고 등록하기
 # @todo 부팅하면서 메타데이터 서버에 접속하는데 timeout나는 문제
-# @todo cinder support
-IMAGE=${IMAGE:-cirros-0.3.0-x86_64}
 
-function get_id() {
-	echo x
-}
+# Image for instance
+IMAGE=${IMAGE:-ubuntu-12.04-server-cloudimg-amd64}
 
-function get_field() {
-	echo x
-}
+# external subnet
+EXTSUBNET=${EXTSUBNET:-10.100.1.128/25}
+
+# tenant private subnet
+PRISUBNET=${PRISUBNET:-172.16.1.0/24}
+
+set -e
 
 if [ -z "$OS_TENANT_NAME" ]; then
 	echo "openstack environ variables is not set"
@@ -31,10 +31,11 @@ if [ "$1" = '-h' ]; then
 fi
 
 if [ "$1" = "-c" ]; then
-	nova list | head -n -1 | tail -n +4 | awk '{print $2}' | xargs -L1 nova delete
-	quantum subnet-list | head -n -1 | tail -n +4 | awk '{print $2}' | xargs -L1 quantum subnet-delete
-	quantum net-list | head -n -1 | tail -n +4 | awk '{print $2}' | xargs -L1 quantum net-delete
-	quantum router-list | head -n -1 | tail -n +4 | awk '{print $2}' | xargs -L1 quantum router-delete
+	[[ ! -z `nova list` ]] && nova list | head -n -1 | tail -n +4 | awk '{print $2}' | xargs -L1 nova delete
+	[[ ! -z `quantum floatingip-list` ]] && quantum floatingip-list | head -n -1 | tail -n +4 | awk '{print $2}' | xargs -L1 quantum floatingip-delete
+	[[ ! -z `quantum subnet-list` ]] && quantum subnet-list | head -n -1 | tail -n +4 | awk '{print $2}' | xargs -L1 quantum subnet-delete || true
+	[[ ! -z `quantum net-list` ]] && quantum net-list | head -n -1 | tail -n +4 | awk '{print $2}' | xargs -L1 quantum net-delete || true
+	[[ ! -z `quantum router-list` ]] && quantum router-list | head -n -1 | tail -n +4 | awk '{print $2}' | xargs -L1 quantum router-delete || true
 	exit
 fi
 
@@ -52,10 +53,23 @@ if [ "$OS_USERNAME" = 'admin' ]; then
 	# create external subnet
 	EXTSUBNET_ID=$(quantum net-show $EXTNET_ID | awk "/ subnets / { print \$4 }")
 	if [ $EXTSUBNET_ID = "|" ]; then
-		EXTSUBNET_ID=$(quantum subnet-create $EXTNET_ID "10.100.1.0/24" --tenant_id=$TENANT_ID --name=${EXTNET}_subnet --enable_dhcp=False | awk '/ id / {print $4}')
+		EXTSUBNET_ID=$(quantum subnet-create $EXTNET_ID "${EXTSUBNET}" \
+					   --tenant_id=$TENANT_ID --name=${EXTNET}_subnet \
+					   --enable_dhcp=False | awk '/ id / {print $4}')
 	fi
 else
 	EXTNET_ID=$(quantum net-list -- --router:external=True | awk "/ $EXTNET / { print \$2 }")
+fi
+
+#
+# Setup default security group
+#
+# @note with quantum's allow_overlapping_ip option then nova security group does'nt work correctly.
+# that's because nova assumes that vm's IP address are unique
+# http://docs.openstack.org/trunk/openstack-network/admin/content/ch_limitations.html
+if [ -z "$(nova secgroup-list-rules default)" ]; then
+	nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
+	nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
 fi
 
 #
@@ -72,7 +86,7 @@ echo "NET=$NET_ID"
 # create private subnet
 SUBNET_ID=$(quantum net-show $NET_ID | awk "/ subnets / { print \$4 }")
 if [ $SUBNET_ID = "|" ]; then
-	SUBNET_ID=$(quantum subnet-create $NET_ID "172.16.1.0/24" \
+	SUBNET_ID=$(quantum subnet-create $NET_ID "${PRISUBNET}" \
 				--tenant_id=$TENANT_ID --name=${PRINET}_subnet \
 				--dns_nameservers list=true 168.126.63.1 8.8.8.8 | \
 				awk '/ id / {print $4}')
@@ -90,8 +104,8 @@ if [ -z "$ROUTER_ID" ]; then
 fi
 echo "ROUTER=$ROUTER_ID"
 
-quantum router-interface-add $ROUTER_ID $SUBNET_ID
-quantum router-gateway-set $ROUTER_ID $EXTNET_ID
+quantum router-interface-add $ROUTER_ID $SUBNET_ID || true
+quantum router-gateway-set $ROUTER_ID $EXTNET_ID || true
 
 #
 # generate keypair
@@ -100,6 +114,7 @@ quantum router-gateway-set $ROUTER_ID $EXTNET_ID
 KEYNAME="${OS_TENANT_NAME}_key"
 if ! nova keypair-list | grep " ${KEYNAME} " > /dev/null ; then
 	nova keypair-add ${KEYNAME} > ${OS_TENANT_NAME}.key
+	chmod 0600 ${OS_TENANT_NAME}.key
 fi
 
 
@@ -127,6 +142,10 @@ if [ ! -z "$VM" ]; then
 
 	# associate floating ip
 	quantum floatingip-associate $FLOATINGIP_ID $PORT_ID
+
+	# create cinder volume and attach
+	VOLUME_ID=$(cinder create --display_name=${VM} 1 | awk '/ id /{print $4}')
+	nova volume-attach ${VM_ID} ${VOLUME_ID} /dev/vdb
 
 	nova show $VM_ID
 fi

@@ -14,10 +14,10 @@
 #use_package = :apt
 
 # 테스팅 패키지 사용
-use_package = :testing
+#use_package = :testing
 
 # cloud archive 패키지 사용
-# use_package = :cloud_archive
+use_package = :cloud_archive
 cloud_archive_version = :folsom
 
 case use_package
@@ -39,9 +39,6 @@ when :cloud_archive
 	# cloud archive key package
 	package "ubuntu-cloud-keyring"
 
-	# cloud archive repository
-	# @note 이 레포지트리의 패키지는 설치할때 --force-yes 옵션이 필요하다.
-	# 즉 아직 완전히 준비가 된 것 같지 않다.
 	apt_repository "openstack-folsom" do
 		uri "http://ubuntu-cloud.archive.canonical.com/ubuntu #{node['lsb']['codename']}-updates/#{cloud_archive_version}"
 		components ["main"]

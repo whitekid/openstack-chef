@@ -26,11 +26,10 @@ sql_connection=<%= @connection %>
 
 auth_strategy=keystone
 compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
-rabbit_host=<%= @control_host %>
+rabbit_host=<%= @rabbit_host %>
 rabbit_password=<%= @rabbit_passwd %>
 glance_api_servers=<%= @control_host %>:9292
 s3_host=<%= @control_host %>
-rabbit_host=<%= @control_host %>
 cc_host=<%= @control_host %>
 ec2_url=http://<%= @control_host %>:8773/services/Cloud
 
@@ -44,6 +43,8 @@ quantum_admin_password=<%= @quantum_user_passwd %>
 quantum_admin_auth_url=http://<%= @control_host %>:35357/v2.0
 libvirt_vif_driver=<%= @libvirt_vif_driver %>
 
+# cinder
+volume_api_class=nova.volume.cinder.API
 
 [keystone_authtoken]
 auth_host = <%= @control_host %>

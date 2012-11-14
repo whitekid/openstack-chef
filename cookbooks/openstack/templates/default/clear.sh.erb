@@ -26,6 +26,7 @@ rm -rf /etc/openvswitch
 rm -rf /etc/apt/sources.list.d/openstack*
 rm -rf /etc/cinder
 losetup -d /dev/loop0
+rm -rf /var/lib/instances
 rm -rf /var/lib/cinder
 rm -rf /var/lib/cinder-volumes
 
@@ -35,10 +36,14 @@ rm -rf /var/log/quantum
 killall dnsmasq
 
 iptables -F
+iptables -F -t nat
+iptables -X
+iptables -X -t nat
 
 dhclient -r eth1
 ifconfig eth1 0 down
 ifconfig eth2 0 down
 ip netns | xargs -L1 ip netns delete
+killall kvm
 
-apt-get clean all
+rm -rf /var/cache/chef

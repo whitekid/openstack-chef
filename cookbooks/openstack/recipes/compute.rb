@@ -5,6 +5,12 @@ end
 packages(%w{nova-compute openvswitch-switch quantum-plugin-openvswitch-agent})
 services(%w{nova-compute openvswitch-switch quantum-plugin-openvswitch-agent libvirt-bin})
 
+# http://www.linux-kvm.org/page/VhostNet
+execute 'enable vhost_net' do
+	command "modprobe vhost_net"
+	not_if "lsmod | grep vhost_net"
+end
+
 bag = data_bag_item('openstack', 'default')
 connection = connection_string('nova', 'nova', bag['dbpasswd']['nova'])
 template "/etc/nova/nova.conf" do
@@ -19,6 +25,7 @@ template "/etc/nova/nova.conf" do
 		"vncserver_listen" => node["ipaddress"],
 		"vncserver_proxyclient_address" => node["ipaddress"],
 		"connection" => connection,
+		"rabbit_host" => bag['rabbit_host'],
 		"rabbit_passwd" => bag['rabbit_passwd'],
 		"control_host" => bag['control_host'],
 		"service_tenant_name" => "service",
@@ -89,6 +96,7 @@ template "/etc/quantum/quantum.conf" do
 	source "compute/quantum.conf.erb"
 	variables({
 		"control_host" => bag['control_host'],
+		"rabbit_host" => bag['rabbit_host'],
 		"rabbit_passwd" => bag['rabbit_passwd'],
 		"rabbit_userid" => 'guest',
 	})

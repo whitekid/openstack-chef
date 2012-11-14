@@ -14,25 +14,21 @@
 			"description":	"management rack",
 			"network":		"10.20.1.0",
 			"netmask":		"255.255.255.0",
-			"gateway":		"10.20.1.2",
+			"gateway":		"10.20.1.1",
 			"range":		"10.20.1.20 10.20.1.49",
 			"next-server":	"10.20.1.2",
 			"hosts": [
-				{ "hostname": "control",		"mac": "00:0c:29:c6:7e:4f",	"ip": "10.20.1.6",	"os": "ubuntu-12.04-amd64" }
-			]
-		},
-		{
-			"id":			"compute01",
-			"description":	"compute rack 01",
-			"network":		"10.30.1.0",
-			"netmask":		"255.255.255.0",
-			"gateway":		"10.30.1.2",
-			"range":		"10.30.1.20 10.30.1.49",
-			"next-server":	"10.30.1.2",
-			"hosts": [
-				{ "hostname": "network",	"mac": "00:0c:29:ca:d1:60",	"ip": "10.30.1.5",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-01-01",	"mac": "00:0c:29:ec:ad:58",	"ip": "10.30.1.20",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-01-02",	"mac": "00:0c:29:53:53:f3",	"ip": "10.30.1.21",	"os": "ubuntu-12.04-amd64" }
+				{ "hostname": "database",		"mac": "00:50:56:3b:94:c9",	"ip": "10.20.1.4",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "control",		"mac": "00:0c:29:c6:7e:4f",	"ip": "10.20.1.6",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "c-vol",			"mac": "00:50:56:29:d6:6c",	"ip": "10.20.1.7",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "network",		"mac": "00:0c:29:ca:d1:60",	"ip": "10.20.1.200",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "net-l3",			"mac": "00:50:56:2c:5b:8b",	"ip": "10.20.1.201",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "net-dhcp",		"mac": "00:50:56:24:6b:7a",	"ip": "10.20.1.202",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "c-01-01",		"mac": "00:0c:29:ec:ad:58",	"ip": "10.20.1.10",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "c-01-02",		"mac": "00:0c:29:53:53:f3",	"ip": "10.20.1.11",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "router-ext",		"mac": "00:50:56:3d:42:b3",	"ip": "10.20.1.250",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "router-data",	"mac": "00:50:56:25:e3:cd",	"ip": "10.20.1.251",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "devstack",		"mac": "00:50:56:38:4c:10",	"ip": "10.20.1.60",		"os": "ubuntu-12.04-amd64" }
 			]
 		},
 		{
@@ -42,9 +38,11 @@
 			"netmask":		"255.255.255.0",
 			"range":		"10.130.1.20 10.130.1.49",
 			"hosts": [
-				{ "hostname": "network-data",	"mac": "00:0c:29:ca:d1:6a",	"ip": "10.130.1.5",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-01-01-data",	"mac": "00:0c:29:ec:ad:62",	"ip": "10.130.1.20",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-01-02-data",	"mac": "00:0c:29:53:53:fd",	"ip": "10.130.1.21",	"os": "ubuntu-12.04-amd64" }
+				{ "hostname": "network-data",	"mac": "00:0c:29:ca:d1:6a",	"ip": "10.130.1.100",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "net-l3-data",	"mac": "00:50:56:25:fc:a1",	"ip": "10.130.1.101",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "net-dhcp-data",	"mac": "00:50:56:3b:02:d2",	"ip": "10.130.1.102",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "c-01-01-data",	"mac": "00:0c:29:ec:ad:62",	"ip": "10.130.1.10",	"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "c-01-02-data",	"mac": "00:0c:29:53:53:fd",	"ip": "10.130.1.11",	"os": "ubuntu-12.04-amd64" }
 			]
 		}
 	]

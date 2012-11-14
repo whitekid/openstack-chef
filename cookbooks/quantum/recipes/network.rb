@@ -77,7 +77,21 @@ template "/etc/quantum/quantum.conf" do
 	source "network/quantum.conf.erb"
 	variables({
 		"control_host" => bag['control_host'],
-		"rabbit_host" => bag['rabbit_host'],
+		"rabbit_passwd" => bag['rabbit_passwd'],
+		"rabbit_userid" => 'guest',
+	})
+	notifies :restart, "service[quantum-dhcp-agent]"
+	notifies :restart, "service[quantum-l3-agent]"
+	notifies :restart, "service[quantum-plugin-openvswitch-agent]"
+end
+
+template "/etc/quantum/quantum.conf" do
+	mode "0644"
+	owner "quantum"
+	group "quantum"
+	source "network/quantum.conf.erb"
+	variables({
+		"control_host" => bag['control_host'],
 		"rabbit_passwd" => bag['rabbit_passwd'],
 		"rabbit_userid" => 'guest',
 		"allow_overlapping_ips" => node['openstack']['allow_overlapping_ips'],

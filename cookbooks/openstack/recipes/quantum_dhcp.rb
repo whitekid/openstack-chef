@@ -2,18 +2,8 @@ class Chef::Recipe
 	include Helper
 end
 
-packages(%w{openvswitch-switch quantum-dhcp-agent quantum-l3-agent quantum-plugin-openvswitch-agent})
-services(%w{openvswitch-switch quantum-dhcp-agent quantum-l3-agent quantum-plugin-openvswitch-agent})
-
-# apply l3 agent bug fix patch
-execute "apply fetch" do
-	action :nothing
-
-	command "wget -O /dev/stdout -q https://github.com/openstack/quantum/commit/84d60f5fd477237bd856b97b9970dd796b10647e.patch | patch -p1"
-	cwd "/usr/lib/python2.7/dist-packages"
-
-	subscribes :run, "package[quantum-l3-agent]", :immediately
-end
+packages(%w{openvswitch-switch quantum-dhcp-agent quantum-plugin-openvswitch-agent})
+services(%w{openvswitch-switch quantum-dhcp-agent quantum-plugin-openvswitch-agent})
 
 bag = data_bag_item('openstack', 'default')
 
@@ -24,14 +14,7 @@ execute "data nic bring up" do
 	not_if "ifconfig eth1 | grep 'inet addr'"
 end
 
-execute "external nic bring up" do
-	command "ip link set up eth2"
-	not_if "ip addr show eth2 | grep eth2 | grep UP"
-end
-
 # setup bridge
-execute "ovs-vsctl -- --may-exist add-br br-ex"
-execute "ovs-vsctl -- --may-exist add-port br-ex eth2"
 execute "ovs-vsctl -- --may-exist add-br br-int"
 
 
@@ -50,23 +33,6 @@ template "/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini" do
 		"local_ip" => %x(until ifconfig eth1 | grep 'inet addr' > /dev/null; do dhclient eth1 > /dev/null; sleep 1; done; ifconfig eth1 | grep 'inet addr' | cut -d : -f 2 | awk '{print $1}'),
 	})
 	notifies :restart, "service[quantum-dhcp-agent]"
-	notifies :restart, "service[quantum-l3-agent]"
-	notifies :restart, "service[quantum-plugin-openvswitch-agent]"
-end
-
-template "/etc/quantum/api-paste.ini" do
-	mode "0644"
-	owner "quantum"
-	group "quantum"
-	source "network/quantum_api-paste.ini.erb"
-	variables({
-		"control_host" => bag['control_host'],
-		"service_tenant_name" => 'service',
-		"service_user_name" => 'quantum',
-		"service_user_passwd" => bag['keystone']['quantum_passwd'],
-	})
-	notifies :restart, "service[quantum-dhcp-agent]"
-	notifies :restart, "service[quantum-l3-agent]"
 	notifies :restart, "service[quantum-plugin-openvswitch-agent]"
 end
 
@@ -77,32 +43,26 @@ template "/etc/quantum/quantum.conf" do
 	source "network/quantum.conf.erb"
 	variables({
 		"control_host" => bag['control_host'],
-		"rabbit_host" => bag['rabbit_host'],
+		"rabbit_passwd" => bag['rabbit_passwd'],
+		"rabbit_userid" => 'guest',
+	})
+	notifies :restart, "service[quantum-dhcp-agent]"
+	notifies :restart, "service[quantum-plugin-openvswitch-agent]"
+end
+
+template "/etc/quantum/quantum.conf" do
+	mode "0644"
+	owner "quantum"
+	group "quantum"
+	source "network/quantum.conf.erb"
+	variables({
+		"control_host" => bag['control_host'],
 		"rabbit_passwd" => bag['rabbit_passwd'],
 		"rabbit_userid" => 'guest',
 		"allow_overlapping_ips" => node['openstack']['allow_overlapping_ips'],
 	})
 	notifies :restart, "service[quantum-dhcp-agent]"
-	notifies :restart, "service[quantum-l3-agent]"
 	notifies :restart, "service[quantum-plugin-openvswitch-agent]"
-end
-
-# @note metadata_ip l3_agent
-template "/etc/quantum/l3_agent.ini" do
-	mode "0644"
-	owner "quantum"
-	group "quantum"
-	source "network/l3_agent.ini.erb"
-	variables({
-		"control_host" => bag['control_host'],
-		"metadata_ip" => bag['metadata_ip'],
-		"region" => 'RegionOne',
-		"service_tenant_name" => 'service',
-		"service_user_name" => 'quantum',
-		"service_user_passwd" => bag['keystone']['quantum_passwd'],
-		"use_namespaces" => node['openstack']['use_namespaces'],
-	})
-	notifies :restart, "service[quantum-l3-agent]"
 end
 
 template "/etc/quantum/dhcp_agent.ini" do

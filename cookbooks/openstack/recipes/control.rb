@@ -3,17 +3,15 @@ class Chef::Recipe
 end
 
 bag = data_bag_item('openstack', 'default')
-#
-# Databases
-#
-node.set['mysql']['server_debian_password'] = bag['dbpasswd']['mysql']
-node.set['mysql']['server_root_password']   = bag['dbpasswd']['mysql']
-node.set['mysql']['server_repl_password']   = bag['dbpasswd']['mysql']
 
-include_recipe "mysql::server"
+# network setup for api-network
+ifconfig bag['metadata_ip'] do
+	device "eth1"
+	mask "255.255.255.0"
+end
 
-%w{keystone glance nova cinder quantum}.each do | db |
-	create_db(db, db, bag['dbpasswd'][db])
+route "172.16.0.0/16" do
+	gateway bag["api_gw"]
 end
 
 
@@ -40,7 +38,7 @@ end
 package "python-mysqldb"
 execute "keystone db sync" do
 	command "keystone-manage db_sync"
-	only_if "test $(mysql -ukeystone -p#{bag['dbpasswd']['keystone']} -h#{bag['control_host']} keystone -e 'show tables' | wc -l) = '0'"
+	only_if "test $(mysql -ukeystone -p#{bag['dbpasswd']['keystone']} -h#{bag['mysql_host']} keystone -e 'show tables' | wc -l) = '0'"
 end
 
 
@@ -98,6 +96,8 @@ template "/etc/glance/glance-api.conf" do
 	variables({
 		"control_host" => bag['control_host'],
 		"glance_passwd" => bag['keystone']['glance_passwd'],
+		"rabbit_host" => bag['rabbit_host'],
+		"rabbit_password" => bag['rabbit_passwd'],
 		"service_tenant_name" => "service",
 		"service_user_name" => "glance",
 		"service_user_passwd" => bag["keystone"]["glance_passwd"],
@@ -145,7 +145,7 @@ bash "glance db sync" do
 	glance-manage version_control 0
 	glance-manage db_sync
 	EOF
-	only_if "test $(mysql -uglance -p#{bag['dbpasswd']['glance']} -h#{bag['control_host']} glance -e 'show tables' | wc -l) = '0'"
+	only_if "test $(mysql -uglance -p#{bag['dbpasswd']['glance']} -h#{bag['mysql_host']} glance -e 'show tables' | wc -l) = '0'"
 end
 
 # @note 
@@ -185,6 +185,7 @@ images = [
 	},
 ]
 
+# @todo wget이 실패했을때 처리
 images.each do |image|
 	bash "download cloud image: #{image['name']}" do
 		local_file = "/var/cache/#{File.basename(image["url"])}"
@@ -211,12 +212,7 @@ end
 #
 # @todo nova-compute의 경우는 mysql에 접속하지 못하면 바로 에러를 내고 종료해버린다. 따라서 이 부분이 상당히 압에서 진행해야할 거 같다.
 packages(%w{nova-novncproxy novnc nova-api nova-ajax-console-proxy nova-cert nova-consoleauth nova-scheduler})
-package "rabbitmq-server"
 services(%w{nova-api nova-cert nova-consoleauth nova-novncproxy nova-scheduler})
-
-execute "rabbitmq" do
-	command "rabbitmqctl change_password guest #{bag['rabbit_passwd']}"
-end
 
 connection = connection_string('nova', 'nova', bag['dbpasswd']['nova'])
 
@@ -224,7 +220,7 @@ bash "nova db sync" do
 	code <<-EOF
 	nova-manage db sync
 	EOF
-	only_if "test $(mysql -unova -p#{bag['dbpasswd']['nova']} -h#{bag['control_host']} nova -e 'show tables' | wc -l) = '0'"
+	only_if "test $(mysql -unova -p#{bag['dbpasswd']['nova']} -h#{bag['mysql_host']} nova -e 'show tables' | wc -l) = '0'"
 	action :nothing
 end
 
@@ -239,6 +235,8 @@ template "/etc/nova/nova.conf" do
 		"service_tenant_name" => "service",
 		"service_user_name" => "nova",
 		"service_user_passwd" => bag["keystone"]["nova_passwd"],
+		"rabbit_host" => bag['rabbit_host'],
+		"rabbit_password" => bag['rabbit_passwd'],
 		# quantum
 		"network_api_class" => "nova.network.quantumv2.api.API",
 		"quantum_tenant_name" => "service",
@@ -276,27 +274,6 @@ execute "wait for nova-api service startup" do
 	command "timeout 5 sh -c 'until wget http://#{bag['control_host']}:8774/ -O /dev/null -q; do sleep 1; done'"
 end
 
-# security group
-# @note with quantum's overlapping_ip then nova security group does'nt work correctly.
-# becase nova assumes that vm's IP address are unique
-# http://docs.openstack.org/trunk/openstack-network/admin/content/ch_limitations.html
-bash "set default security group" do
-	code <<-EOF
-	export OS_TENANT_NAME=admin
-	export OS_USERNAME=admin
-	export OS_PASSWORD=#{bag['keystone']['admin_passwd']}
-	export OS_AUTH_URL=http://#{bag["control_host"]}:35357/v2.0 add
-	export OS_NO_CACHE=-1
-
-	nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
-	nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
-	EOF
-	only_if "test -z $(nova --os-tenant-name=admin --os-username=admin --os-password=#{bag['keystone']['admin_passwd']} --os-auth-url=http://#{bag['control_host']}:35357/v2.0 --no-cache secgroup-list-rules default)"
-end
-
-# @todo add keypair
-# refer to http://docs.openstack.org/trunk/openstack-compute/install/apt/content/running-an-instance.html
-
 #
 # Quantum
 #
@@ -325,6 +302,7 @@ template "/etc/quantum/quantum.conf" do
 	source "control/quantum.conf.erb"
 	variables({
 		"control_host" => bag['control_host'],
+		"rabbit_host" => bag['rabbit_host'],
 		"rabbit_passwd" => bag['rabbit_passwd'],
 		"rabbit_userid" => 'guest',
 		"allow_overlapping_ips" => node['openstack']['allow_overlapping_ips'],
@@ -349,25 +327,8 @@ end
 #
 # cinder
 #
-# @todo /dev/loop0가 이미 사용 되었을 수도 있음..
-packages(%w{tgt lvm2})
-
-# backing file for volume
-bash "create backing file" do
-	code <<-EOF
-	BACKING=/var/lib/cinder-volumes
-	DEV=/dev/loop0
-
-	truncate --size 100G $BACKING
-	losetup $DEV $BACKING
-	pvcreate $DEV
-	vgcreate cinder-volumes $DEV
-	EOF
-	not_if "vgscan | grep cinder-volumes"
-end
-
-packages(%w{cinder-api cinder-scheduler cinder-volume})
-services(%w{cinder-api cinder-scheduler cinder-volume})
+packages(%w{cinder-api cinder-scheduler})
+services(%w{cinder-api cinder-scheduler})
 
 template "/etc/cinder/api-paste.ini" do
 	mode "0644"
@@ -393,17 +354,17 @@ template "/etc/cinder/cinder.conf" do
 	variables({
 		"connection" => connection,
 		"control_host" => bag['control_host'],
+		"rabbit_host" => bag['rabbit_host'],
 		"rabbit_passwd" => bag['rabbit_passwd'],
 		"rabbit_userid" => 'guest',
 	})
 	notifies :restart, "service[cinder-api]"
 	notifies :restart, "service[cinder-scheduler]"
-	notifies :restart, "service[cinder-volume]"
 end
 
 execute "cinder db sync" do
 	command "cinder-manage db sync"
-	only_if "test $(mysql -ucinder -p#{bag['dbpasswd']['cinder']} -h#{bag['control_host']} cinder -e 'show tables' | wc -l) = '0'"
+	only_if "test $(mysql -ucinder -p#{bag['dbpasswd']['cinder']} -h#{bag['mysql_host']} cinder -e 'show tables' | wc -l) = '0'"
 end
 
 #
@@ -430,6 +391,11 @@ end
 cookbook_file "/root/bin/vm_create.sh" do
 	mode "0700"
 	source "vm_create.sh"
+end
+
+cookbook_file "/root/bin/tenant_create.sh" do
+	mode "0700"
+	source "tenant_create.sh"
 end
 
 template "/root/bin/keystone_clear.sh" do

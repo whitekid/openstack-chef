@@ -5,6 +5,7 @@ service "isc-dhcp-server" do
 	action [:enable, :restart]
 end
 
+# @note pxe는 eth0에서 listen, 나머지는 eth1에서 listen
 template "/etc/dhcp/dhcpd.conf" do
 	source "dhcpd.conf.erb"
 	mode 0644

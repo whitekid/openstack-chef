@@ -47,8 +47,19 @@ end
 # predownload cloud-images for cache
 #
 directory "#{wwwroot}/cloud-images"
-%w{https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
-http://uec-images.ubuntu.com/releases/precise/release-20121001/ubuntu-12.04-server-cloudimg-amd64-disk1.img}.each do |image|
+
+images=%w{https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
+http://uec-images.ubuntu.com/releases/precise/release-20121001/ubuntu-12.04-server-cloudimg-amd64-disk1.img
+http://uec-images.ubuntu.com/releases/quantal/release-20121017/ubuntu-12.10-server-cloudimg-amd64-disk1.img
+}
+
+images=%w{
+http://192.168.100.108:8080/uec-images/cirros-0.3.0-x86_64-disk.img
+http://192.168.100.108:8080/uec-images/releases/precise/release-20121026.1/ubuntu-12.04-server-cloudimg-amd64-disk1.img
+http://192.168.100.108:8080/uec-images/releases/quantal/release-20121017/ubuntu-12.10-server-cloudimg-amd64-disk1.img
+}
+
+images.each do |image|
 	local_file = "#{wwwroot}/cloud-images/#{File.basename(image)}"
 	puts local_file
 
@@ -61,19 +72,19 @@ end
 #
 # nfs-server 설정: 임시로...
 #
-include_recipe "nfs::server"
+#include_recipe "nfs::server"
 
 # 개발용 캐쉬라구요..
-%w{git_cache pip_cache}.each do |path|
-	directory "/nfs/#{path}" do
-		recursive true
-		mode "0777"
-	end
-end
-
-template "/etc/exports" do
-	source "exports.erb"
-	notifies :restart, resources(:service => node['nfs']['service']['server'])
-end
+#%w{git_cache pip_cache}.each do |path|
+#	directory "/nfs/#{path}" do
+#		recursive true
+#		mode "0777"
+#	end
+#end
+#
+#template "/etc/exports" do
+#	source "exports.erb"
+#	notifies :restart, resources(:service => node['nfs']['service']['server'])
+#end
 
 # vim: ts=4 nu sw=4 ai
