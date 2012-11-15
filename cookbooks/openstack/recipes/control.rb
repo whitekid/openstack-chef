@@ -38,7 +38,6 @@ end
 package "python-mysqldb"
 execute "keystone db sync" do
 	command "keystone-manage db_sync"
-	only_if "test $(mysql -ukeystone -p#{bag['dbpasswd']['keystone']} -h#{bag['mysql_host']} keystone -e 'show tables' | wc -l) = '0'"
 end
 
 
@@ -145,7 +144,6 @@ bash "glance db sync" do
 	glance-manage version_control 0
 	glance-manage db_sync
 	EOF
-	only_if "test $(mysql -uglance -p#{bag['dbpasswd']['glance']} -h#{bag['mysql_host']} glance -e 'show tables' | wc -l) = '0'"
 end
 
 # @note 
@@ -207,6 +205,8 @@ images.each do |image|
 end
 
 
+include_recipe "cinder"
+
 #
 # nova-services
 #
@@ -215,14 +215,6 @@ packages(%w{nova-novncproxy novnc nova-api nova-ajax-console-proxy nova-cert nov
 services(%w{nova-api nova-cert nova-consoleauth nova-novncproxy nova-scheduler})
 
 connection = connection_string('nova', 'nova', bag['dbpasswd']['nova'])
-
-bash "nova db sync" do
-	code <<-EOF
-	nova-manage db sync
-	EOF
-	only_if "test $(mysql -unova -p#{bag['dbpasswd']['nova']} -h#{bag['mysql_host']} nova -e 'show tables' | wc -l) = '0'"
-	action :nothing
-end
 
 template "/etc/nova/nova.conf" do
 	mode "0644"
@@ -251,6 +243,12 @@ template "/etc/nova/nova.conf" do
 	%w{nova-api nova-cert nova-consoleauth nova-novncproxy nova-scheduler}.each do |svc|
 		notifies :restart, "service[#{svc}]", :immediately
 	end
+end
+
+bash "nova db sync" do
+	code <<-EOF
+	nova-manage db sync
+	EOF
 end
 
 template "/etc/nova/api-paste.ini" do
@@ -322,49 +320,6 @@ template "/etc/quantum/api-paste.ini" do
 		"service_user_passwd" => bag['keystone']['quantum_passwd'],
 	})
 	notifies :restart, "service[quantum-server]"
-end
-
-#
-# cinder
-#
-packages(%w{cinder-api cinder-scheduler})
-services(%w{cinder-api cinder-scheduler})
-
-template "/etc/cinder/api-paste.ini" do
-	mode "0644"
-	owner "cinder"
-	group "cinder"
-	source "control/cinder_api-paste.ini.erb"
-	variables({
-		"control_host" => bag["control_host"],
-		"service_tenant_name" => 'service',
-		"service_user_name" => 'cinder',
-		"service_user_passwd" => bag['keystone']['cinder_passwd'],
-		"cinder_port" => 6000,
-	})
-	notifies :restart, "service[cinder-api]"
-end
-
-connection = connection_string('cinder', 'cinder', bag['dbpasswd']['cinder'])
-template "/etc/cinder/cinder.conf" do
-	mode "0644"
-	owner "cinder"
-	group "cinder"
-	source "control/cinder.conf.erb"
-	variables({
-		"connection" => connection,
-		"control_host" => bag['control_host'],
-		"rabbit_host" => bag['rabbit_host'],
-		"rabbit_passwd" => bag['rabbit_passwd'],
-		"rabbit_userid" => 'guest',
-	})
-	notifies :restart, "service[cinder-api]"
-	notifies :restart, "service[cinder-scheduler]"
-end
-
-execute "cinder db sync" do
-	command "cinder-manage db sync"
-	only_if "test $(mysql -ucinder -p#{bag['dbpasswd']['cinder']} -h#{bag['mysql_host']} cinder -e 'show tables' | wc -l) = '0'"
 end
 
 #

@@ -10,27 +10,11 @@ vm_path=${vm_path:-"~/vmware/openstack"}
 vms+="${vm_path}/database/database.vmx:10.20.1.4 "
 vms+="${vm_path}/control/control.vmx:10.20.1.6 "
 vms+="${vm_path}/cinder-volume/cinder-volume.vmx:10.20.1.7 "
-#vms+="${vm_path}/network/network.vmx:10.20.1.200 "
 vms+="${vm_path}/net-l3/net-l3.vmx:10.20.1.201 "
 vms+="${vm_path}/net-dhcp/net-dhcp.vmx:10.20.1.202 "
 vms+="${vm_path}/c-01-01/c-01-01.vmx:10.20.1.10 "
 vms+="${vm_path}/c-01-02/c-01-02.vmx:10.20.1.11 "
 
-# restore vm
-vm_revert=${vm_revert:-true}
-vm_snapshot=${vm_snapshot:-created}
-if [ "$vm_revert" = "true" ]; then
-	for vm in $vms; do
-		v=`echo $vm | cut -d : -f 1`
-		echo "revert $v to snapshot $vm_snapshot"
-		vmrun revertToSnapshot $v $vm_snapshot
-		sleep 1
-		echo "starting $v"
-		vmrun start $v
-	done
-fi
-
-# bootstrap chef
 function do_ssh(){
 	sshpass -pchoe ssh root@$@
 }
@@ -48,7 +32,21 @@ function sync_clock() {
 	do_ssh $ip 'until ntpdate -u -b pool.ntp.org; do sheep 3; done; hwclock -w'
 }
 
+# restore vm
+vm_revert=${vm_revert:-true}
+vm_snapshot=${vm_snapshot:-created}
+
 for vm in $vms; do
+	if [ "$vm_revert" = "true" ]; then
+		v=`echo $vm | cut -d : -f 1`
+		echo "revert $v to snapshot $vm_snapshot"
+		vmrun revertToSnapshot $v $vm_snapshot
+		sleep 1
+		echo "starting $v"
+		vmrun start $v
+	fi
+
+	# bootstrap chef
 	ip=`echo $vm | cut -d : -f 2`
 
 	wait_for "do_ssh $ip echo" "waiting $node($ip) to boot up..." 3
