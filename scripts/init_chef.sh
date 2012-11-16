@@ -41,11 +41,13 @@ for vm in $vms; do
 		v=`echo $vm | cut -d : -f 1`
 		echo "revert $v to snapshot $vm_snapshot"
 		vmrun revertToSnapshot $v $vm_snapshot
-		sleep 1
+		sleep 3
 		echo "starting $v"
 		vmrun start $v
 	fi
+done
 
+for vm in $vms; do
 	# bootstrap chef
 	ip=`echo $vm | cut -d : -f 2`
 
@@ -71,7 +73,7 @@ for vm in $vms; do
 
 	# @note 재시작해야 chef가 클라이언트를 등록한다.
 	sync_clock
-	do_ssh $ip service chef-client restart
+	do_ssh $ip service chef-client restart || true
 
 	wait_for "knife node show $node" "waiting $node($ip) to chef register..." 3
 

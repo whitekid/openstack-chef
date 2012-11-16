@@ -1,4 +1,4 @@
 vm_path=~/vmware/openstack
 vm_revert=true
-vm_snapshot=os_setup
+vm_snapshot=created
 chef_bootstrap=apt

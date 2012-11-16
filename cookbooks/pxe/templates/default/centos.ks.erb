@@ -1,6 +1,8 @@
 install
 text
-url --url "http://<%= @ipaddr %>/images/<%= @id %>"
+url --url "http://<%= @mirror_host %>/<%= @mirror_path %>/<%= @release %>/os/<%= @arch %>/"
+repo --name updates --baseurl="http://<%= @mirror_host %>/<%= @mirror_path %>/<%= @release %>/updates/<%= @arch %>/"
+
 lang en_US.UTF-8
 keyboard us
 

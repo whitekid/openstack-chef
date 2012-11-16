@@ -45,26 +45,23 @@ node[:pxe][:items].each do |item|
 		})
 	end
 
-	## copy pxe installer from image
-	# @todo copy from image server
+	## copy pxe network installer image
 	case item[:platform]
 	when 'ubuntu'
 		files = %w{ linux initrd.gz }
 		dir = "install/netboot/ubuntu-installer/#{item[:arch]}"
 
+		url_base = "http://#{item[:mirror_host]}/#{item[:mirror_path]}/dists/#{item[:release]}/main/installer-#{item[:arch]}/current/images/netboot/ubuntu-installer/#{item[:arch]}"
+
 	when 'centos'
 		files = %w{ vmlinuz initrd.img }
 		dir = "images/pxeboot"
+		url_base = "http://#{item[:mirror_host]}/centos/#{item[:release]}/os/#{item[:arch]}/images/pxeboot"
 	end
 
 	files.each do |f|
-		# @note remote_file로 가져오는게 이상한데?
-		#remote_file "#{pxe_image_dir}/#{f}" do
-		#	source = "http://#{bag[:pxe_image_host]}/images/#{item[:id]}/#{dir}/#{f}"
-		#	puts "hahaha #{source}"
-		#end
 		execute "#{pxe_image_dir}/#{f}" do
-			command "wget -c -O #{pxe_image_dir}/#{f} http://#{bag['properties']['pxe_image_host']}/images/#{item[:id]}/#{dir}/#{f}"
+			command "wget -c -O #{pxe_image_dir}/#{f} #{url_base}/#{f}"
 			only_if "ping #{bag['properties']['pxe_image_host']} -c 1"
 		end
 	end

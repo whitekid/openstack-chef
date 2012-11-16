@@ -4,6 +4,14 @@ end
 
 bag = data_bag_item('openstack', 'default')
 
+# ip address for iscsi
+# @note storage의 address는 eth0 주소에서 2번째 network만 바꾼다. eg) 10.20.1.21 --> 10.130.1.21
+#eth0 = iface_addr('eth0').split('.')
+#eth0[1] = '140'
+#eth1 = etho.join('.')
+
+
+
 #
 # cinder
 #

@@ -20,6 +20,6 @@
 # @todo move settings to data_bag
 case platform
 when "ubuntu"
-  set[:ubuntu][:archive_url]  = "http://ftp.daum.net/ubuntu"
-  set[:ubuntu][:security_url] = "http://ftp.daum.net/ubuntu"
+  set[:ubuntu][:archive_url]  = "http://192.168.100.108:8080/apt-mirror/ftp.daum.net/ubuntu"
+  set[:ubuntu][:security_url] = "http://192.168.100.108:8080/apt-mirror/ftp.daum.net/ubuntu"
 end

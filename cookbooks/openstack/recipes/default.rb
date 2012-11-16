@@ -40,7 +40,9 @@ when :cloud_archive
 	package "ubuntu-cloud-keyring"
 
 	apt_repository "openstack-folsom" do
-		uri "http://ubuntu-cloud.archive.canonical.com/ubuntu #{node['lsb']['codename']}-updates/#{cloud_archive_version}"
+		#uri "http://ubuntu-cloud.archive.canonical.com/ubuntu #{node['lsb']['codename']}-updates/#{cloud_archive_version}"
+		# @note cloud archive mirroring: see...
+		uri "http://192.168.100.108:8080/apt-mirror/ubuntu-cloud.archive.canonical.com/ubuntu #{node['lsb']['codename']}-updates/#{cloud_archive_version}"
 		components ["main"]
 	end
 end

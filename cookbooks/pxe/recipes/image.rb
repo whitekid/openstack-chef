@@ -2,43 +2,38 @@ wwwroot='/var/www'
 
 eth0 = node["network"]["interfaces"]["eth0"]["addresses"].select { |address, data| data["family"] == "inet" }[0][0]
 
-# @todo md5sum for iso images
 node[:pxe][:items].each do |item|
 	install_image_dir = "#{wwwroot}/images/#{item[:id]}"
 
-	## kickstart
 	directory "#{wwwroot}/ks/"
-	template "#{wwwroot}/ks/#{item[:id]}.ks" do
-		source "#{item[:platform]}.ks.erb"
-		mode "0644"
-		variables({
-			:id => item[:id],
-			:ipaddr => eth0,
-			:packages => item[:packages],
-			:post_script => item[:post_script]
-		})
-	end
 
-	# CDImage Download
-	local_file="/var/cache/#{item[:id]}.iso"
-	bash "download iso file: #{item[:cdimage]}" do
-		code <<-EOH
-		wget -O #{local_file} -nv #{item[:cdimage]}
-		EOH
-		not_if { File.exists?(local_file) }
-	end
-
-	directory install_image_dir do
-		recursive true
-	end
-
-	# mount install cd
-	package "fuseiso"
-	mount install_image_dir do
-		device local_file
-		fstype "fuse.fuseiso"
-		options "allow_other"
-		not_if "mount | grep fuseiso | grep '#{item[:id]} '"
+	case item[:platform]
+	when 'centos' # kickstart for centos
+		template "#{wwwroot}/ks/#{item[:id]}.ks" do
+			source "#{item[:platform]}.ks.erb"
+			mode "0644"
+			variables({
+				:id => item[:id],
+				:mirror_host => item[:mirror_host],
+				:mirror_path => item[:mirror_path],
+				:release => item[:release],
+				:arch => item[:arch],
+				:packages => item[:packages],
+				:post_script => item[:post_script]
+			})
+		end
+	when 'ubuntu'	# preceed for ubuntu
+		template "#{wwwroot}/ks/#{item[:id]}.seed" do
+			source "#{item[:platform]}.seed.erb"
+			mode "0644"
+			variables({
+				:id => item[:id],
+				:ipaddr => eth0,
+				:packages => item[:packages],
+				:mirror_host => item[:mirror_host],
+				:mirror_path => item[:mirror_path],
+			})
+		end
 	end
 end
 
@@ -69,22 +64,3 @@ images.each do |image|
 	end
 end
 
-#
-# nfs-server 설정: 임시로...
-#
-#include_recipe "nfs::server"
-
-# 개발용 캐쉬라구요..
-#%w{git_cache pip_cache}.each do |path|
-#	directory "/nfs/#{path}" do
-#		recursive true
-#		mode "0777"
-#	end
-#end
-#
-#template "/etc/exports" do
-#	source "exports.erb"
-#	notifies :restart, resources(:service => node['nfs']['service']['server'])
-#end
-
-# vim: ts=4 nu sw=4 ai

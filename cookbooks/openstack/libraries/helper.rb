@@ -31,5 +31,9 @@ module Helper
 			package p
 		end
 	end
+
+	def iface_addr(iface)
+		return node["network"]["interfaces"][iface]["addresses"].select { |address, data| data["family"] == "inet" }[0][0]
+	end
 end
 # vim: nu ai ts=4 sw=4
