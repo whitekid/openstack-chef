@@ -64,7 +64,7 @@ for vm in $vms; do
 	knife node delete $node -y || true
 	knife client delete $node -y || true
 
-	do_ssh $ip '(apt-get purge -y --auto-remove chef; rm -rf /etc/chef)'
+	do_ssh $ip '(apt-get purge -y chef; rm -rf /etc/chef)'
 
 	# quantal은 gem 버전으로 설치하면 되고 아래 파일을 추가한다
 	# /etc/init.d/chef-client # 여기에는 경로 수정이 필요함
@@ -81,7 +81,7 @@ for vm in $vms; do
 	domain=choe
 	case $node in
 		"database.${domain}")
-			run_list="role[openstack_database] role[openstack_rabbitmq]"
+			run_list="role[openstack_database],role[openstack_rabbitmq]"
 			;;
 		"control.${domain}")
 			run_list="role[openstack_control]"
@@ -106,9 +106,7 @@ for vm in $vms; do
 			;;
 	esac
 
-	for l in "$run_list"; do
-		knife node run_list add "${node}" "${l}"
-	done
+	knife node run_list add "${node}" "${run_list}"
 
 	# reboot to apply chef role
 	do_ssh $ip reboot

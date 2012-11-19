@@ -10,4 +10,3 @@ vms+="${vm_path}/net-l3/net-l3.vmx:10.20.1.201 "
 vms+="${vm_path}/net-dhcp/net-dhcp.vmx:10.20.1.202 "
 vms+="${vm_path}/c-01-01/c-01-01.vmx:10.20.1.10 "
 vms+="${vm_path}/c-01-02/c-01-02.vmx:10.20.1.11 "
-
