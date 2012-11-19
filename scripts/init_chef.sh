@@ -11,10 +11,20 @@ function do_ssh(){
 }
 
 function wait_for() {
+	local first=0
+
 	until $1; do
-		echo $2
+		if [ $first = 0 ]; then
+			echo -n $2;
+			first=1
+		else
+			echo -n .
+		fi
+
 		sleep $3
 	done
+
+	echo
 }
 
 function sync_clock() {
@@ -39,6 +49,11 @@ function _revert_vm() {
 		vmrun start $v
 		sleep 3
 	done
+}
+
+function role_settled(){
+	knife search node roles:$required_role | grep ^IP > /dev/null
+	return $?
 }
 
 if [ "$vm_revert" = "true" ]; then
@@ -111,16 +126,22 @@ for vm in $vms; do
 			;;
 	esac
 
-	function role_settled(){
-		knife search node roles:$required_role | grep ^IP > /dev/null
-		return $?
-	}
-
 	[ ! -z "$required_role" ] && wait_for "role_settled ${required_role}" "waiting role installing ${required_role}..." 5
 	knife node run_list add "${node}" "${run_list}"
 
 	# reboot to apply chef role
 	do_ssh $ip reboot
 done
+
+
+# create test vm
+control_ip=$(knife search node roles:openstack-control | awk '/^IP/{print $2}')
+function _compute_up() {
+	test $(do_ssh $control_ip nova-manage service list 2>&1 | grep nova-compute | grep -c ':-)') == "$compute_count"
+}
+wait_for _compute_up "wait for nova-compute up..." 5
+
+# launch vm
+do_ssh $control_ip ". openrc admin ; bin/vm_create.sh test0; until ping -c 3 172.16.1.3; do sleep 3; done"
 
 # vim: nu ai ts=4 sw=4

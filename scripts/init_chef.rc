@@ -1,6 +1,7 @@
 vm_revert=true
 vm_snapshot=os_setup
 chef_bootstrap=apt
+compute_count=2
 
 vm_path="/home/choe/vmware/openstack"
 vms+="${vm_path}/database/database.vmx:10.20.1.4 "
