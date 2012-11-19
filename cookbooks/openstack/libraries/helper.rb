@@ -16,8 +16,14 @@ module Helper
 	def get_roled_node(role)
 		result, _, _ = Chef::Search::Query.new.search(:node, "roles:#{role}")
 
-		if result.length == 0 and node["roles"].include?(role):
-			return node
+		if result.length == 0 
+			if node["roles"].include?(role):
+				return node	# this node
+			end
+
+			msg = "Cannot find node for role '#{role}'"
+			Chef::Log.fatal(msg)
+			raise msg
 		end
 
 		return result[0]

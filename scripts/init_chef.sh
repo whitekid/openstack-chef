@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-set -m
 
 dir=`dirname $0`
 if [ -f "$dir/init_chef.rc" ]; then
@@ -79,6 +78,7 @@ for vm in $vms; do
 
 	run_list=''
 	domain=choe
+	required_role=''
 	case $node in
 		"database.${domain}")
 			run_list="role[openstack-database],role[openstack-rabbitmq]"
@@ -87,18 +87,23 @@ for vm in $vms; do
 			run_list="role[openstack-control]"
 			;;
 		"c-vol.${domain}")
+			required_role='openstack-control'
 			run_list="role[cinder-volume]"
 			;;
 		"network.${domain}")
+			required_role='openstack-control'
 			run_list="role[openstack-network]"
 			;;
 		"net-l3.${domain}")
+			required_role='openstack-control'
 			run_list="role[quantum-l3-agent]"
 			;;
 		"net-dhcp.${domain}")
+			required_role='openstack-control'
 			run_list="role[quantum-dhcp-agent]"
 			;;
 		c-[0-9][0-9]-[0-9][0-9].${domain})
+			required_role='openstack-control'
 			run_list="role[openstack-compute]"
 			;;
 		*)
@@ -106,6 +111,12 @@ for vm in $vms; do
 			;;
 	esac
 
+	function role_settled(){
+		knife search node roles:$required_role | grep ^IP > /dev/null
+		return $?
+	}
+
+	[ ! -z "$required_role" ] && wait_for "role_settled ${required_role}" "waiting role installing ${required_role}..." 5
 	knife node run_list add "${node}" "${run_list}"
 
 	# reboot to apply chef role
