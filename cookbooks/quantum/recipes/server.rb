@@ -5,9 +5,10 @@ packages(%w{quantum-server quantum-plugin-openvswitch})
 services(%w{quantum-server})
 
 bag = data_bag_item('openstack', 'default')
-control_host = get_roled_host('openstack_control')
+control_host = get_roled_host('openstack-control')
+db_node = get_roled_node('openstack-database')
 
-connection = connection_string('quantum', 'quantum', bag['dbpasswd']['quantum'])
+connection = connection_string('quantum', 'quantum', db_node['mysql']['openstack_passwd']['quantum'])
 template "/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini" do
 	mode "0644"
 	owner "quantum"

@@ -61,7 +61,7 @@ template "/root/bin/clear.sh" do
 	source "clear.sh.erb"
 end
 
-control_host = get_roled_host('openstack_control')
+control_host = get_roled_host('openstack-control')
 template "/root/openrc" do
 	source "openrc.erb"
 	variables({

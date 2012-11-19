@@ -5,7 +5,7 @@ end
 packages(%w{quantum-l3-agent})
 services(%w{quantum-l3-agent})
 
-control_host = get_roled_host('openstack_control')
+control_host = get_roled_host('openstack-control')
 
 # apply l3 agent bug fix patch
 execute "apply fetch" do

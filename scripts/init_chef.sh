@@ -81,28 +81,28 @@ for vm in $vms; do
 	domain=choe
 	case $node in
 		"database.${domain}")
-			run_list="role[openstack_database],role[openstack_rabbitmq]"
+			run_list="role[openstack-database],role[openstack-rabbitmq]"
 			;;
 		"control.${domain}")
-			run_list="role[openstack_control]"
+			run_list="role[openstack-control]"
 			;;
 		"c-vol.${domain}")
-			run_list="role[cinder_volume]"
+			run_list="role[cinder-volume]"
 			;;
 		"network.${domain}")
-			run_list="role[openstack_network]"
+			run_list="role[openstack-network]"
 			;;
 		"net-l3.${domain}")
-			run_list="role[quantum_l3]"
+			run_list="role[quantum-l3-agent]"
 			;;
 		"net-dhcp.${domain}")
-			run_list="role[quantum_dhcp]"
+			run_list="role[quantum-dhcp-agent]"
 			;;
 		c-[0-9][0-9]-[0-9][0-9].${domain})
-			run_list="role[openstack_compute]"
+			run_list="role[openstack-compute]"
 			;;
 		*)
-			run_list="role[openstack_base]"
+			run_list="role[openstack-base]"
 			;;
 	esac
 

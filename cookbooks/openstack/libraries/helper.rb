@@ -2,8 +2,9 @@ module Helper
 	# mysql helper functions
 	def create_db(dbname, dbuser, dbpass)
 		package "mysql-client"
+
+		rootpw = get_roled_node('openstack-database')['mysql']['server_root_password']
 		bash "create database #{dbname}" do
-			rootpw = data_bag_item('openstack', 'default')['dbpasswd']['mysql']
 			code <<-EOF
 				mysql -uroot -p#{rootpw} -e 'CREATE DATABASE #{dbname}'
 				mysql -uroot -p#{rootpw} -e 'GRANT ALL ON #{dbname}.* TO "#{dbuser}"@"%" IDENTIFIED BY "#{dbpass}"'
@@ -12,18 +13,22 @@ module Helper
 		end
 	end
 
-	def get_roled_host(role)
+	def get_roled_node(role)
 		result, _, _ = Chef::Search::Query.new.search(:node, "roles:#{role}")
 
 		if result.length == 0 and node["roles"].include?(role):
-			return node['ipaddress']
+			return node
 		end
 
-		return result[0]['ipaddress']
+		return result[0]
+	end
+
+	def get_roled_host(role)
+		return get_roled_node(role)['ipaddress']
 	end
 
 	def connection_string(dbname, dbuser, dbpass)
-		mysql_host = get_roled_host('openstack_database')
+		mysql_host = get_roled_host('openstack-database')
 
 		return "mysql://#{dbuser}:#{dbpass}@#{mysql_host}/#{dbname}?charset=utf8"
 	end

@@ -12,7 +12,7 @@ packages(%w{cinder-api})
 services(%w{cinder-api})
 
 bag = data_bag_item('openstack', 'default')
-control_host = get_roled_host('openstack_control')
+control_host = get_roled_host('openstack-control')
 
 template "/etc/cinder/api-paste.ini" do
 	mode "0644"

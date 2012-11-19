@@ -5,8 +5,9 @@ end
 packages(%w{nova-compute openvswitch-switch quantum-plugin-openvswitch-agent})
 services(%w{nova-compute openvswitch-switch quantum-plugin-openvswitch-agent libvirt-bin})
 
-rabbit_host = get_roled_host('openstack_rabbitmq')
-control_host = get_roled_host('openstack_control')
+rabbit_host = get_roled_host('openstack-rabbitmq')
+control_host = get_roled_host('openstack-control')
+db_node = get_roled_node('openstack-database')
 
 # http://www.linux-kvm.org/page/VhostNet
 execute 'enable vhost_net' do
@@ -15,7 +16,7 @@ execute 'enable vhost_net' do
 end
 
 bag = data_bag_item('openstack', 'default')
-connection = connection_string('nova', 'nova', bag['dbpasswd']['nova'])
+connection = connection_string('nova', 'nova', db_node['mysql']['openstack_passwd']['nova'])
 template "/etc/nova/nova.conf" do
 	mode "0644"
 	user "nova"

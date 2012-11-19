@@ -7,8 +7,9 @@ services(%w{openvswitch-switch quantum-plugin-openvswitch-agent})
 
 bag = data_bag_item('openstack', 'default')
 
-control_host = get_roled_host('openstack_control')
-rabbit_host = get_roled_host('openstack_rabbitmq')
+control_host = get_roled_host('openstack-control')
+db_node = get_roled_node('openstack-database')
+rabbit_host = get_roled_host('openstack-rabbitmq')
 
 #
 # network connectivity
@@ -22,7 +23,7 @@ end
 # setup bridge
 execute "ovs-vsctl -- --may-exist add-br br-int"
 
-connection = connection_string('quantum', 'quantum', bag['dbpasswd']['quantum'])
+connection = connection_string('quantum', 'quantum', db_node['mysql']['openstack_passwd']['quantum'])
 template "/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini" do
 	mode "0644"
 	owner "quantum"

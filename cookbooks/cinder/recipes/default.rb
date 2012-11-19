@@ -16,10 +16,11 @@ packages(%w{cinder-common})
 
 bag = data_bag_item('openstack', 'default')
 
-control_host = get_roled_host('openstack_control')
-rabbit_host = get_roled_host('openstack_rabbitmq')
+db_node = get_roled_node('openstack-database')
+control_host = get_roled_host('openstack-control')
+rabbit_host = get_roled_host('openstack-rabbitmq')
 
-connection = connection_string('cinder', 'cinder', bag['dbpasswd']['cinder'])
+connection = connection_string('cinder', 'cinder', db_node['mysql']['openstack_passwd']['cinder'])
 template "/etc/cinder/cinder.conf" do
 	mode "0644"
 	owner "cinder"

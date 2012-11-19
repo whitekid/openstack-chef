@@ -2,10 +2,13 @@ class Chef::Recipe
 	include Helper
 end
 
+::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
+
 bag = data_bag_item('openstack', 'default')
 
-control_host = get_roled_host('openstack_control')
-rabbit_host = get_roled_host('openstack_rabbitmq')
+db_node = get_roled_node('openstack-database')
+control_host = get_roled_host('openstack-control')
+rabbit_host = get_roled_host('openstack-rabbitmq')
 
 # network setup for api-network
 ifconfig bag['metadata_ip'] do
@@ -24,13 +27,15 @@ end
 packages(%w{"keystone"})
 services(%w{keystone})
 
-connection = connection_string('keystone', 'keystone', bag['dbpasswd']['keystone'])
+node.set_unless['keystone']['admin_token'] = secure_password
+
+connection = connection_string('keystone', 'keystone', db_node['mysql']['openstack_passwd']['keystone'])
 template "/etc/keystone/keystone.conf" do
 	mode "0644"
 	source "control/keystone.conf.erb"
 	variables({
 		"connection" => connection,
-		"admin_token" => bag['admin_token'],
+		"admin_token" => node['keystone']['admin_token'],
 	})
 
 	# @note: 여기서 재시작하지 않으면 keystone-init에서 오류가 발생함
@@ -54,7 +59,7 @@ template "/root/config.yaml" do
 	mode "0644"
 	source "control/config.yaml.erb"
 	variables({
-		"admin_token" => bag['admin_token'],
+		"admin_token" => node['keystone']['admin_token'],
 		"control_host" => control_host,
 		'keystone' => bag['keystone'],
 	})
@@ -62,7 +67,7 @@ end
 
 execute "keystone setup" do
 	command "python /root/keystone-init.py /root/config.yaml"
-	not_if "keystone --token=#{bag['admin_token']} --endpoint http://#{control_host}:35357/v2.0 tenant-list | grep ' admin '"
+	not_if "keystone --token=#{node['keystone']['admin_token']} --endpoint http://#{control_host}:35357/v2.0 tenant-list | grep ' admin '"
 end
 
 
@@ -110,7 +115,7 @@ template "/etc/glance/glance-api.conf" do
 	notifies :restart, "service[glance-api]", :immediately
 end
 
-connection = connection_string('glance', 'glance', bag['dbpasswd']['glance'])
+connection = connection_string('glance', 'glance', db_node['mysql']['openstack_passwd']['glance'])
 template "/etc/glance/glance-registry.conf" do
 	mode "0644"
 	owner "glance"
@@ -210,7 +215,7 @@ include_recipe "cinder"
 packages(%w{nova-novncproxy novnc nova-api nova-ajax-console-proxy nova-cert nova-consoleauth nova-scheduler})
 services(%w{nova-api nova-cert nova-consoleauth nova-novncproxy nova-scheduler})
 
-connection = connection_string('nova', 'nova', bag['dbpasswd']['nova'])
+connection = connection_string('nova', 'nova', db_node['mysql']['openstack_passwd']['nova'])
 
 template "/etc/nova/nova.conf" do
 	mode "0644"
@@ -304,7 +309,7 @@ template "/root/bin/keystone_clear.sh" do
 	source "control/keystone_clear.sh.erb"
 
 	variables({
-		"mysql_passwd" => bag['dbpasswd']['mysql'],
+		"mysql_passwd" => db_node['mysql']['openstack_passwd']['keystone'],
 	})
 end
 # vim: nu ai ts=4 sw=4
