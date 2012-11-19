@@ -1,8 +1,3 @@
-# default : 
-# server  : quantum-server, quantum-plugin-openvswitch
-# agent   : quantum-plugin-openvswitch-agent
-# l3      : quantum-l3-agent
-# dhcp    : quantum-dhcp-agent
 class Chef::Recipe
 	include Helper
 end
