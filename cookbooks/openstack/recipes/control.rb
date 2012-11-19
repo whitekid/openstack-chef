@@ -146,12 +146,6 @@ bash "glance db sync" do
 	EOF
 end
 
-# @note 
-require "uri"
-u = URI(bag['proxy'])
-u.port = 80
-pxe = u.to_s
-
 # Register Images only apply to qcow2 image
 # http://docs.openstack.org/trunk/openstack-compute/install/apt/content/uploading-to-glance.html
 # http://docs.openstack.org/trunk/openstack-compute/admin/content/starting-images.html
@@ -165,20 +159,20 @@ images = [
 	# https://launchpad.net/cirros
 	{
 		"name" => "cirros-0.3.0-x86_64",
-		"url" => "#{pxe}/cloud-images/cirros-0.3.0-x86_64-disk.img",
+		"url" => "#{bag['cache_host']}/uec-images/cirros-0.3.0-x86_64-disk.img",
 		"checksum" => "50bdc35edb03a38d91b1b071afb20a3c",
 	},
 	# Ubuntu 12.04 cloud image
 	{
 		"name" => 'ubuntu-12.04-server-cloudimg-amd64',
 		#"url" => "http://uec-images.ubuntu.com/releases/precise/release-20121001/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
-		"url" => "#{pxe}/cloud-images/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
+		"url" => "#{bag['cache_host']}/uec-images/releases/precise/release-20121026.1/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
 		"checksum" => "030a4451f5968ee26d3d75b7759e0d8c",
 	},
 	# Ubuntu 12.10 cloud image
 	{
 		"name" => 'ubuntu-12.10-server-cloudimg-amd64',
-		"url" => "#{pxe}/cloud-images/ubuntu-12.10-server-cloudimg-amd64-disk1.img",
+		"url" => "#{bag['cache_host']}/uec-images/releases/quantal/release-20121017/ubuntu-12.10-server-cloudimg-amd64-disk1.img",
 		"checksum" => "ba66e7e4f7eb9967fe044c808e92700a",
 	},
 ]
@@ -188,9 +182,8 @@ images.each do |image|
 	bash "download cloud image: #{image['name']}" do
 		local_file = "/var/cache/#{File.basename(image["url"])}"
 
+		puts image['url']
 		code <<-EOF
-		export http_proxy=#{bag["proxy"]}
-
 		wget -c -O #{local_file} #{image['url']}
 
 		export OS_TENANT_NAME=admin
@@ -272,55 +265,6 @@ execute "wait for nova-api service startup" do
 	command "timeout 5 sh -c 'until wget http://#{bag['control_host']}:8774/ -O /dev/null -q; do sleep 1; done'"
 end
 
-#
-# Quantum
-#
-packages(%w{quantum-server quantum-plugin-openvswitch})
-services(%w{quantum-server})
-connection = connection_string('quantum', 'quantum', bag['dbpasswd']['quantum'])
-template "/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini" do
-	mode "0644"
-	owner "quantum"
-	group "quantum"
-	source "control/ovs_quantum_plugin.ini.erb"
-	variables({
-		"connection" => connection,
-		"enable_tunneling" => true,
-		"tenant_network_type" => 'gre',
-		"tunnel_id_ranges" => '1:1000',
-		# @note control node not required local_ip settings
-	})
-	notifies :restart, "service[quantum-server]"
-end
-
-template "/etc/quantum/quantum.conf" do
-	mode "0644"
-	owner "quantum"
-	group "quantum"
-	source "control/quantum.conf.erb"
-	variables({
-		"control_host" => bag['control_host'],
-		"rabbit_host" => bag['rabbit_host'],
-		"rabbit_passwd" => bag['rabbit_passwd'],
-		"rabbit_userid" => 'guest',
-		"allow_overlapping_ips" => node['openstack']['allow_overlapping_ips'],
-	})
-	notifies :restart, "service[quantum-server]"
-end
-
-template "/etc/quantum/api-paste.ini" do
-	mode "0644"
-	owner "quantum"
-	group "quantum"
-	source "control/quantum_api-paste.ini.erb"
-	variables({
-		"control_host" => bag['control_host'],
-		"service_tenant_name" => 'service',
-		"service_user_name" => 'quantum',
-		"service_user_passwd" => bag['keystone']['quantum_passwd'],
-	})
-	notifies :restart, "service[quantum-server]"
-end
 
 #
 # Dashboard
@@ -338,7 +282,6 @@ template "/etc/openstack-dashboard/local_settings.py" do
 	})
 	notifies :restart, "service[apache2]"
 end
-
 
 #
 # utility scripts

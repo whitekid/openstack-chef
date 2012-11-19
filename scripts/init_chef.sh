@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -m
 
 dir=`dirname $0`
 if [ -f "$dir/init_chef.rc" ]; then
@@ -36,16 +37,25 @@ function sync_clock() {
 vm_revert=${vm_revert:-true}
 vm_snapshot=${vm_snapshot:-created}
 
-for vm in $vms; do
-	if [ "$vm_revert" = "true" ]; then
-		v=`echo $vm | cut -d : -f 1`
-		echo "revert $v to snapshot $vm_snapshot"
-		vmrun revertToSnapshot $v $vm_snapshot
-		sleep 3
+function _revert_vm() {
+	vm=$1
+
+	v=`echo $vm | cut -d : -f 1`
+	echo "revert $v to snapshot $vm_snapshot"
+	vmrun revertToSnapshot $v $vm_snapshot
+	sleep 3
+	until vmrun list | grep "$v" > /dev/null ; do
 		echo "starting $v"
 		vmrun start $v
-	fi
-done
+		sleep 3
+	done
+}
+
+if [ "$vm_revert" = "true" ]; then
+	for vm in $vms; do
+		_revert_vm $vm
+	done
+fi
 
 for vm in $vms; do
 	# bootstrap chef
@@ -68,8 +78,7 @@ for vm in $vms; do
 	# quantal은 gem 버전으로 설치하면 되고 아래 파일을 추가한다
 	# /etc/init.d/chef-client # 여기에는 경로 수정이 필요함
 	# /etc/default/chef-client
-	knife bootstrap $ip -d ubuntu${release}-apt -xroot -Pchoe \
-		--bootstrap-version=0.10 --bootstrap-proxy=http://10.20.1.3:3128
+	knife bootstrap $ip -d ubuntu${release}-apt -xroot -Pchoe --bootstrap-version=0.10
 
 	# @note 재시작해야 chef가 클라이언트를 등록한다.
 	sync_clock
@@ -110,11 +119,6 @@ for vm in $vms; do
 
 	# reboot to apply chef role
 	do_ssh $ip reboot
-
-	# 
-	if [ $node = 'control.${domain}' ]; then
-		echo "@todo wait until api server up"
-	fi
 done
 
 # vim: nu ai ts=4 sw=4

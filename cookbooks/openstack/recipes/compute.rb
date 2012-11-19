@@ -102,4 +102,27 @@ template "/etc/quantum/quantum.conf" do
 	})
 	notifies :restart, "service[quantum-plugin-openvswitch-agent]"
 end
+
+#
+# simple GlusterFS support
+# http://www.gluster.org/wp-content/uploads/2011/07/Gluster-Openstack-VM-storage-v1-shehjar.pdf
+
+package "glusterfs-client"
+package "glusterfs-server"
+directory "/vmstorage"
+
+# $ gluster peer probe 10.20.1.11
+# $ mkdir /vmstorage
+# $ gluster volume create nova-storage replica 2 10.20.1.10:/vmstore 10.20.1.11:/vmstore
+# $ gluster volume start nova-storage
+# $ mount -t glusterfs 10.20.1.10:nova-storage /var/lib/nova/instances
+# $ chown nova.nova /var/lib/nova/instance
+# 권한 문제
+# 로컬디스크에서는 아래처럼 파일 권한이 생긴다.
+# -rw-rw---- 1 libvirt-qemu kvm        0 Nov 17 04:04 console.log
+# -rw-r--r-- 1 libvirt-qemu kvm  1114112 Nov 17 04:04 disk
+# -rw-rw-r-- 1 nova         nova    1379 Nov 17 04:04 libvirt.xml
+# 하지만 glusterfs는 다르고 disk 파일을 열 수 없다는 오류가 발생
+
+
 # vim: nu ai ts=4 sw=4

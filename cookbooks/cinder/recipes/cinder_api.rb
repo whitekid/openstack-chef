@@ -27,3 +27,4 @@ template "/etc/cinder/api-paste.ini" do
 	})
 	notifies :restart, "service[cinder-api]"
 end
+# vim: nu ai ts=4 sw=4

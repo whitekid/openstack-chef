@@ -1,5 +1,3 @@
-# @todo squid가 설정이 완료되기도 전에 이 recipe에서 proxy를 사용하는 문제가 있음
-
 config_dir = "#{node['tftp']['directory']}/pxelinux.cfg"
 
 directory config_dir

@@ -37,3 +37,4 @@ execute "cinder db sync" do
 	command "cinder-manage db sync"
 end
 
+# vim: nu ai ts=4 sw=4

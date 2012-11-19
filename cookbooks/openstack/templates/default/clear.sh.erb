@@ -9,8 +9,9 @@ purge glance
 purge rabbitmq-server
 purge python-novaclient
 purge libvirt0 open-iscsi
-purge quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent quantum-dhcp-agent quantum-l3-agent openvswitch-switch
-purge cinder-api cinder-volume cinder-scheduler python-cinderclient tgt
+purge quantum-common quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent quantum-dhcp-agent quantum-l3-agent openvswitch-switch
+purge cinder-common cinder-api cinder-volume cinder-scheduler python-cinderclient tgt
+apt-get cleal all
 
 rm -rf /etc/keystone
 rm -rf /var/lib/mysql
