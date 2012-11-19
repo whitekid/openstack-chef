@@ -39,21 +39,6 @@ template "/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini" do
 	notifies :restart, "service[quantum-plugin-openvswitch-agent]"
 end
 
-template "/etc/quantum/quantum.conf" do
-	mode "0644"
-	owner "quantum"
-	group "quantum"
-	source "quantum.conf.erb"
-	variables({
-		"control_host" => control_host,
-		"rabbit_host" => rabbit_host,
-		"rabbit_passwd" => bag['rabbit_passwd'],
-		"rabbit_userid" => 'guest',
-		"allow_overlapping_ips" => node['openstack']['allow_overlapping_ips'],
-	})
-	notifies :restart, "service[quantum-plugin-openvswitch-agent]"
-end
-
 #
 # utility scripts
 #
