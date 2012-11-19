@@ -81,7 +81,7 @@ for vm in $vms; do
 	domain=choe
 	case $node in
 		"database.${domain}")
-			run_list="role[openstack_database]"
+			run_list="role[openstack_database] role[openstack_rabbitmq]"
 			;;
 		"control.${domain}")
 			run_list="role[openstack_control]"
@@ -106,7 +106,9 @@ for vm in $vms; do
 			;;
 	esac
 
-	knife node run_list add "${node}" "${run_list}"
+	for l in "$run_list"; do
+		knife node run_list add "${node}" "${l}"
+	done
 
 	# reboot to apply chef role
 	do_ssh $ip reboot

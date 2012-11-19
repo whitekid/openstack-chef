@@ -5,6 +5,9 @@ end
 packages(%w{nova-compute openvswitch-switch quantum-plugin-openvswitch-agent})
 services(%w{nova-compute openvswitch-switch quantum-plugin-openvswitch-agent libvirt-bin})
 
+rabbit_host = get_roled_host('openstack_rabbitmq')
+control_host = get_roled_host('openstack_control')
+
 # http://www.linux-kvm.org/page/VhostNet
 execute 'enable vhost_net' do
 	command "modprobe vhost_net"
@@ -25,9 +28,9 @@ template "/etc/nova/nova.conf" do
 		"vncserver_listen" => node["ipaddress"],
 		"vncserver_proxyclient_address" => node["ipaddress"],
 		"connection" => connection,
-		"rabbit_host" => bag['rabbit_host'],
+		"rabbit_host" => rabbit_host,
 		"rabbit_passwd" => bag['rabbit_passwd'],
-		"control_host" => bag['control_host'],
+		"control_host" => control_host,
 		"service_tenant_name" => "service",
 		"service_user_name" => "nova",
 		"service_user_passwd" => bag["keystone"]["nova_passwd"],

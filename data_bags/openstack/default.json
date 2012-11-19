@@ -10,7 +10,6 @@
 		"quantum": "quantum_passwd"
 	},
 	"control_host": "10.20.1.6",
-	"rabbit_host": "10.20.1.4",
 	"metadata_ip": "10.100.1.6",
 	"api_gw": "10.100.1.129",
 	"admin_token": "admin_token",

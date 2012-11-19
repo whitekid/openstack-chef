@@ -12,6 +12,7 @@ packages(%w{cinder-api})
 services(%w{cinder-api})
 
 bag = data_bag_item('openstack', 'default')
+control_host = get_roled_host('openstack_control')
 
 template "/etc/cinder/api-paste.ini" do
 	mode "0644"
@@ -19,7 +20,7 @@ template "/etc/cinder/api-paste.ini" do
 	group "cinder"
 	source "api-paste.ini.erb"
 	variables({
-		"control_host" => bag["control_host"],
+		"control_host" => control_host,
 		"service_tenant_name" => 'service',
 		"service_user_name" => 'cinder',
 		"service_user_passwd" => bag['keystone']['cinder_passwd'],

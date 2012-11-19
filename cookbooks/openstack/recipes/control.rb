@@ -4,6 +4,9 @@ end
 
 bag = data_bag_item('openstack', 'default')
 
+control_host = get_roled_host('openstack_control')
+rabbit_host = get_roled_host('openstack_rabbitmq')
+
 # network setup for api-network
 ifconfig bag['metadata_ip'] do
 	device "eth1"
@@ -52,14 +55,14 @@ template "/root/config.yaml" do
 	source "control/config.yaml.erb"
 	variables({
 		"admin_token" => bag['admin_token'],
-		"control_host" => bag['control_host'],
+		"control_host" => control_host,
 		'keystone' => bag['keystone'],
 	})
 end
 
 execute "keystone setup" do
 	command "python /root/keystone-init.py /root/config.yaml"
-	not_if "keystone --token=#{bag['admin_token']} --endpoint http://#{bag['control_host']}:35357/v2.0 tenant-list | grep ' admin '"
+	not_if "keystone --token=#{bag['admin_token']} --endpoint http://#{control_host}:35357/v2.0 tenant-list | grep ' admin '"
 end
 
 
@@ -86,15 +89,16 @@ template "/etc/glance/glance-api-paste.ini" do
 	notifies :restart, "service[glance-api]", :immediately
 end
 
+
 template "/etc/glance/glance-api.conf" do
 	mode "0644"
 	owner "glance"
 	group "glance"
 	source "control/glance-api.conf.erb"
 	variables({
-		"control_host" => bag['control_host'],
+		"control_host" => control_host,
 		"glance_passwd" => bag['keystone']['glance_passwd'],
-		"rabbit_host" => bag['rabbit_host'],
+		"rabbit_host" => rabbit_host,
 		"rabbit_password" => bag['rabbit_passwd'],
 		"service_tenant_name" => "service",
 		"service_user_name" => "glance",
@@ -113,7 +117,7 @@ template "/etc/glance/glance-registry.conf" do
 	group "glance"
 	source "control/glance-registry.conf.erb"
 	variables({
-		"control_host" => bag['control_host'],
+		"control_host" => control_host,
 		"glance_passwd" => bag['keystone']['glance_passwd'],
 		"service_tenant_name" => "service",
 		"service_user_name" => "glance",
@@ -188,11 +192,11 @@ images.each do |image|
 		export OS_TENANT_NAME=admin
 		export OS_USERNAME=admin
 		export OS_PASSWORD=#{bag['keystone']['admin_passwd']}
-		export OS_AUTH_URL=http://#{bag["control_host"]}:35357/v2.0 add
+		export OS_AUTH_URL=http://#{control_host}:35357/v2.0 add
 		glance add name=#{image['name']} disk_format=qcow2 container_format=bare is_public=true < #{local_file}
 		EOF
 
-		not_if "glance --os-tenant-name=admin --os-username=admin --os-password=#{bag['keystone']['admin_passwd']} --os-auth-url=http://#{bag["control_host"]}:35357/v2.0 image-list | grep ' #{image['name']} '"
+		not_if "glance --os-tenant-name=admin --os-username=admin --os-password=#{bag['keystone']['admin_passwd']} --os-auth-url=http://#{control_host}:35357/v2.0 image-list | grep ' #{image['name']} '"
 	end
 end
 
@@ -215,11 +219,11 @@ template "/etc/nova/nova.conf" do
 	source "control/nova.conf.erb"
 	variables({
 		"connection" => connection,
-		"control_host" => bag['control_host'],
+		"control_host" => control_host,
 		"service_tenant_name" => "service",
 		"service_user_name" => "nova",
 		"service_user_passwd" => bag["keystone"]["nova_passwd"],
-		"rabbit_host" => bag['rabbit_host'],
+		"rabbit_host" => rabbit_host,
 		"rabbit_password" => bag['rabbit_passwd'],
 		# quantum
 		"network_api_class" => "nova.network.quantumv2.api.API",
@@ -249,7 +253,7 @@ template "/etc/nova/api-paste.ini" do
 	group "nova"
 	source "control/nova_api-paste.ini.erb"
 	variables({
-		"control_host" => bag['control_host'],
+		"control_host" => control_host,
 		"service_tenant_name" => "service",
 		"service_user_name" => "nova",
 		"service_user_passwd" => bag["keystone"]["nova_passwd"],
@@ -261,7 +265,7 @@ template "/etc/nova/api-paste.ini" do
 end
 
 execute "wait for nova-api service startup" do
-	command "timeout 5 sh -c 'until wget http://#{bag['control_host']}:8774/ -O /dev/null -q; do sleep 1; done'"
+	command "timeout 5 sh -c 'until wget http://#{control_host}:8774/ -O /dev/null -q; do sleep 1; done'"
 end
 
 

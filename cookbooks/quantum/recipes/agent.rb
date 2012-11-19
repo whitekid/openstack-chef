@@ -7,6 +7,9 @@ services(%w{openvswitch-switch quantum-plugin-openvswitch-agent})
 
 bag = data_bag_item('openstack', 'default')
 
+control_host = get_roled_host('openstack_control')
+rabbit_host = get_roled_host('openstack_rabbitmq')
+
 #
 # network connectivity
 # eth1: data-networks with dhcp enabled
@@ -42,8 +45,8 @@ template "/etc/quantum/quantum.conf" do
 	group "quantum"
 	source "quantum.conf.erb"
 	variables({
-		"control_host" => bag['control_host'],
-		"rabbit_host" => bag['rabbit_host'],
+		"control_host" => control_host,
+		"rabbit_host" => rabbit_host,
 		"rabbit_passwd" => bag['rabbit_passwd'],
 		"rabbit_userid" => 'guest',
 		"allow_overlapping_ips" => node['openstack']['allow_overlapping_ips'],

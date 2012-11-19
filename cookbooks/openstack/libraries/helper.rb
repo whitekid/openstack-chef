@@ -12,10 +12,18 @@ module Helper
 		end
 	end
 
+	def get_roled_host(role)
+		result, _, _ = Chef::Search::Query.new.search(:node, "roles:#{role}")
+
+		if result.length == 0 and node["roles"].include?(role):
+			return node['ipaddress']
+		end
+
+		return result[0]['ipaddress']
+	end
+
 	def connection_string(dbname, dbuser, dbpass)
-		bag = data_bag_item('openstack', 'default')
-		result, _, _ = Chef::Search::Query.new.search(:node, "roles:openstack_database")
-		mysql_host = result[0]['ipaddress']
+		mysql_host = get_roled_host('openstack_database')
 
 		return "mysql://#{dbuser}:#{dbpass}@#{mysql_host}/#{dbname}?charset=utf8"
 	end

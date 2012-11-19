@@ -16,6 +16,9 @@ packages(%w{cinder-common})
 
 bag = data_bag_item('openstack', 'default')
 
+control_host = get_roled_host('openstack_control')
+rabbit_host = get_roled_host('openstack_rabbitmq')
+
 connection = connection_string('cinder', 'cinder', bag['dbpasswd']['cinder'])
 template "/etc/cinder/cinder.conf" do
 	mode "0644"
@@ -24,8 +27,8 @@ template "/etc/cinder/cinder.conf" do
 	source "cinder.conf.erb"
 	variables({
 		"connection" => connection,
-		"control_host" => bag['control_host'],
-		"rabbit_host" => bag['rabbit_host'],
+		"control_host" => control_host,
+		"rabbit_host" => rabbit_host,
 		"rabbit_passwd" => bag['rabbit_passwd'],
 		"rabbit_userid" => 'guest',
 	})

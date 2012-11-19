@@ -5,6 +5,7 @@ packages(%w{quantum-server quantum-plugin-openvswitch})
 services(%w{quantum-server})
 
 bag = data_bag_item('openstack', 'default')
+control_host = get_roled_host('openstack_control')
 
 connection = connection_string('quantum', 'quantum', bag['dbpasswd']['quantum'])
 template "/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini" do
@@ -28,7 +29,7 @@ template "/etc/quantum/api-paste.ini" do
 	group "quantum"
 	source "api-paste.ini.erb"
 	variables({
-		"control_host" => bag['control_host'],
+		"control_host" => control_host,
 		"service_tenant_name" => 'service',
 		"service_user_name" => 'quantum',
 		"service_user_passwd" => bag['keystone']['quantum_passwd'],

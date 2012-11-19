@@ -6,6 +6,10 @@
 #
 # All rights reserved - Do Not Redistribute
 #
+class Chef::Recipe
+	include Helper
+end
+
 
 # @note 현재 패키지에는 folsom이 들어가 있다.
 # 하지만 testing 패키지 말고는 완전히 테스트 되지 않았음
@@ -57,11 +61,11 @@ template "/root/bin/clear.sh" do
 	source "clear.sh.erb"
 end
 
-bag = data_bag_item('openstack', 'default')
+control_host = get_roled_host('openstack_control')
 template "/root/openrc" do
 	source "openrc.erb"
 	variables({
-		"control_host" => bag['control_host'],
+		"control_host" => control_host,
 	})
 end
 
