@@ -7,15 +7,6 @@ if [ -f "$dir/init_chef.rc" ]; then
 	source "$dir/init_chef.rc"
 fi
 
-vm_path=${vm_path:-"~/vmware/openstack"}
-vms+="${vm_path}/database/database.vmx:10.20.1.4 "
-vms+="${vm_path}/control/control.vmx:10.20.1.6 "
-vms+="${vm_path}/cinder-volume/cinder-volume.vmx:10.20.1.7 "
-vms+="${vm_path}/net-l3/net-l3.vmx:10.20.1.201 "
-vms+="${vm_path}/net-dhcp/net-dhcp.vmx:10.20.1.202 "
-vms+="${vm_path}/c-01-01/c-01-01.vmx:10.20.1.10 "
-vms+="${vm_path}/c-01-02/c-01-02.vmx:10.20.1.11 "
-
 function do_ssh(){
 	sshpass -pchoe ssh root@$@
 }
