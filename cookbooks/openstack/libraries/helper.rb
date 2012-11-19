@@ -14,7 +14,10 @@ module Helper
 
 	def connection_string(dbname, dbuser, dbpass)
 		bag = data_bag_item('openstack', 'default')
-		return "mysql://#{dbuser}:#{dbpass}@#{bag["mysql_host"]}/#{dbname}?charset=utf8"
+		result, _, _ = Chef::Search::Query.new.search(:node, "roles:openstack_database")
+		mysql_host = result[0]['ipaddress']
+
+		return "mysql://#{dbuser}:#{dbpass}@#{mysql_host}/#{dbname}?charset=utf8"
 	end
 
 	def services(svcs)

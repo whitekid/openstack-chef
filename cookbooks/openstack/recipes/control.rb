@@ -19,7 +19,6 @@ end
 # Keystone
 #
 packages(%w{"keystone"})
-
 services(%w{keystone})
 
 connection = connection_string('keystone', 'keystone', bag['dbpasswd']['keystone'])
