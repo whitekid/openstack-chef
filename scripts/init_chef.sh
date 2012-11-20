@@ -98,6 +98,10 @@ for vm in $vms; do
 		"database.${domain}")
 			run_list="role[openstack-database],role[openstack-rabbitmq]"
 			;;
+		"keystone.${domain}")
+			required_role='openstack-database'
+			run_list="role[keystone-server]"
+			;;
 		"control.${domain}")
 			run_list="role[openstack-control]"
 			;;

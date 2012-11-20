@@ -1,7 +1,7 @@
 ---
 # token is the admin_token in keystone.conf
 token:    <%= @admin_token %>
-endpoint: http://<%= @control_host %>:35357/v2.0
+endpoint: http://<%= @keystone_host %>:35357/v2.0
 
 default tenant:
     name:        admin

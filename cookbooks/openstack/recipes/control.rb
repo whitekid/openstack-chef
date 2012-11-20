@@ -9,6 +9,7 @@ bag = data_bag_item('openstack', 'default')
 db_node = get_roled_node('openstack-database')
 control_host = get_roled_host('openstack-control')
 rabbit_host = get_roled_host('openstack-rabbitmq')
+keystone_node = get_roled_node('keystone-server')
 
 # network setup for api-network
 ifconfig bag['metadata_ip'] do
@@ -22,30 +23,30 @@ end
 
 
 #
-# Keystone
+# Keystone client
 #
-packages(%w{"keystone"})
-services(%w{keystone})
-
-node.set_unless['keystone']['admin_token'] = secure_password
-
-connection = connection_string('keystone', 'keystone', db_node['mysql']['openstack_passwd']['keystone'])
-template "/etc/keystone/keystone.conf" do
-	mode "0644"
-	source "control/keystone.conf.erb"
-	variables({
-		"connection" => connection,
-		"admin_token" => node['keystone']['admin_token'],
-	})
-
-	# @note: 여기서 재시작하지 않으면 keystone-init에서 오류가 발생함
-	notifies :restart, "service[keystone]", :immediately
-end
-
-package "python-mysqldb"
-execute "keystone db sync" do
-	command "keystone-manage db_sync"
-end
+#packages(%w{"keystone"})
+#services(%w{keystone})
+#
+#node.set_unless['keystone']['admin_token'] = secure_password
+#
+#connection = connection_string('keystone', 'keystone', db_node['mysql']['openstack_passwd']['keystone'])
+#template "/etc/keystone/keystone.conf" do
+#	mode "0644"
+#	source "control/keystone.conf.erb"
+#	variables({
+#		"connection" => connection,
+#		"admin_token" => node['keystone']['admin_token'],
+#	})
+#
+#	# @note: 여기서 재시작하지 않으면 keystone-init에서 오류가 발생함
+#	notifies :restart, "service[keystone]", :immediately
+#end
+#
+#package "python-mysqldb"
+#execute "keystone db sync" do
+#	command "keystone-manage db_sync"
+#end
 
 
 # create tenants, user, service, endpoints
@@ -59,7 +60,8 @@ template "/root/config.yaml" do
 	mode "0644"
 	source "control/config.yaml.erb"
 	variables({
-		"admin_token" => node['keystone']['admin_token'],
+		"admin_token" => keystone_node['keystone']['admin_token'],
+		"keystone_host" => keystone_node['ipaddress'],
 		"control_host" => control_host,
 		'keystone' => bag['keystone'],
 	})
@@ -67,13 +69,14 @@ end
 
 execute "keystone setup" do
 	command "python /root/keystone-init.py /root/config.yaml"
-	not_if "keystone --token=#{node['keystone']['admin_token']} --endpoint http://#{control_host}:35357/v2.0 tenant-list | grep ' admin '"
+	not_if "keystone --token=#{keystone_node['keystone']['admin_token']} --endpoint http://#{keystone_node['ipaddress']}:35357/v2.0 tenant-list | grep ' admin '"
 end
 
 
 #
 # Glance
 #
+package "python-mysqldb"
 %w{glance glance-api glance-common python-glanceclient glance-registry python-glance}.each do | pkg |
 	package pkg do
 		options "--force-yes"
@@ -101,7 +104,7 @@ template "/etc/glance/glance-api.conf" do
 	group "glance"
 	source "control/glance-api.conf.erb"
 	variables({
-		"control_host" => control_host,
+		"keystone_host" => keystone_node['ipaddress'],
 		"glance_passwd" => bag['keystone']['glance_passwd'],
 		"rabbit_host" => rabbit_host,
 		"rabbit_password" => bag['rabbit_passwd'],
@@ -122,7 +125,7 @@ template "/etc/glance/glance-registry.conf" do
 	group "glance"
 	source "control/glance-registry.conf.erb"
 	variables({
-		"control_host" => control_host,
+		"keystone_host" => keystone_node['ipaddress'],
 		"glance_passwd" => bag['keystone']['glance_passwd'],
 		"service_tenant_name" => "service",
 		"service_user_name" => "glance",
@@ -190,18 +193,17 @@ images.each do |image|
 	bash "download cloud image: #{image['name']}" do
 		local_file = "/var/cache/#{File.basename(image["url"])}"
 
-		puts image['url']
 		code <<-EOF
 		wget -c -O #{local_file} #{image['url']}
 
 		export OS_TENANT_NAME=admin
 		export OS_USERNAME=admin
 		export OS_PASSWORD=#{bag['keystone']['admin_passwd']}
-		export OS_AUTH_URL=http://#{control_host}:35357/v2.0 add
+		export OS_AUTH_URL=http://#{keystone_node['ipaddress']}:35357/v2.0 add
 		glance add name=#{image['name']} disk_format=qcow2 container_format=bare is_public=true < #{local_file}
 		EOF
 
-		not_if "glance --os-tenant-name=admin --os-username=admin --os-password=#{bag['keystone']['admin_passwd']} --os-auth-url=http://#{control_host}:35357/v2.0 image-list | grep ' #{image['name']} '"
+		not_if "glance --os-tenant-name=admin --os-username=admin --os-password=#{bag['keystone']['admin_passwd']} --os-auth-url=http://#{keystone_node['ipaddress']}:35357/v2.0 image-list | grep ' #{image['name']} '"
 	end
 end
 
@@ -225,6 +227,7 @@ template "/etc/nova/nova.conf" do
 	variables({
 		"connection" => connection,
 		"control_host" => control_host,
+		"keystone_host" => keystone_node['ipaddress'],
 		"service_tenant_name" => "service",
 		"service_user_name" => "nova",
 		"service_user_passwd" => bag["keystone"]["nova_passwd"],
@@ -258,7 +261,7 @@ template "/etc/nova/api-paste.ini" do
 	group "nova"
 	source "control/nova_api-paste.ini.erb"
 	variables({
-		"control_host" => control_host,
+		"keystone_host" => keystone_node['ipaddress'],
 		"service_tenant_name" => "service",
 		"service_user_name" => "nova",
 		"service_user_passwd" => bag["keystone"]["nova_passwd"],
@@ -304,12 +307,4 @@ cookbook_file "/root/bin/tenant_create.sh" do
 	source "tenant_create.sh"
 end
 
-template "/root/bin/keystone_clear.sh" do
-	mode "0700"
-	source "control/keystone_clear.sh.erb"
-
-	variables({
-		"mysql_passwd" => db_node['mysql']['openstack_passwd']['keystone'],
-	})
-end
 # vim: nu ai ts=4 sw=4

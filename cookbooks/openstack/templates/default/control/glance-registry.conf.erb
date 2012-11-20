@@ -68,7 +68,7 @@ use_syslog = False
 #ca_file = /path/to/cafile
 
 [keystone_authtoken]
-auth_host = <%= @control_host %>
+auth_host = <%= @keystone_host %>
 auth_port = 35357
 auth_protocol = http
 admin_tenant_name = <%= @service_tenant_name %>
