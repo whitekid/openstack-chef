@@ -5,7 +5,7 @@ end
 packages(%w{quantum-l3-agent})
 services(%w{quantum-l3-agent})
 
-control_host = get_roled_host('openstack-control')
+keystone_host = get_roled_host('keystone-server')
 
 # apply l3 agent bug fix patch
 execute "apply fetch" do
@@ -35,7 +35,7 @@ template "/etc/quantum/l3_agent.ini" do
 	group "quantum"
 	source "l3_agent.ini.erb"
 	variables({
-		"control_host" => control_host,
+		"keystone_host" => keystone_host,
 		"metadata_ip" => bag['metadata_ip'],
 		"region" => 'RegionOne',
 		"service_tenant_name" => 'service',

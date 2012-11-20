@@ -107,7 +107,7 @@ template "/etc/glance/glance-api.conf" do
 		"keystone_host" => keystone_node['ipaddress'],
 		"glance_passwd" => bag['keystone']['glance_passwd'],
 		"rabbit_host" => rabbit_host,
-		"rabbit_password" => bag['rabbit_passwd'],
+		"rabbit_passwd" => bag['rabbit_passwd'],
 		"service_tenant_name" => "service",
 		"service_user_name" => "glance",
 		"service_user_passwd" => bag["keystone"]["glance_passwd"],
@@ -176,14 +176,13 @@ images = [
 	# Ubuntu 12.04 cloud image
 	{
 		"name" => 'ubuntu-12.04-server-cloudimg-amd64',
-		#"url" => "http://uec-images.ubuntu.com/releases/precise/release-20121001/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
-		"url" => "#{bag['cache_host']}/uec-images/releases/precise/release-20121026.1/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
+		"url" => "#{bag['cache_host']}/uec-images/releases/precise/20121119/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
 		"checksum" => "030a4451f5968ee26d3d75b7759e0d8c",
 	},
 	# Ubuntu 12.10 cloud image
 	{
 		"name" => 'ubuntu-12.10-server-cloudimg-amd64',
-		"url" => "#{bag['cache_host']}/uec-images/releases/quantal/release-20121017/ubuntu-12.10-server-cloudimg-amd64-disk1.img",
+		"url" => "#{bag['cache_host']}/uec-images/releases/quantal/20121118/ubuntu-12.10-server-cloudimg-amd64-disk1.img",
 		"checksum" => "ba66e7e4f7eb9967fe044c808e92700a",
 	},
 ]
@@ -232,7 +231,7 @@ template "/etc/nova/nova.conf" do
 		"service_user_name" => "nova",
 		"service_user_passwd" => bag["keystone"]["nova_passwd"],
 		"rabbit_host" => rabbit_host,
-		"rabbit_password" => bag['rabbit_passwd'],
+		"rabbit_passwd" => bag['rabbit_passwd'],
 		# quantum
 		"network_api_class" => "nova.network.quantumv2.api.API",
 		"quantum_tenant_name" => "service",

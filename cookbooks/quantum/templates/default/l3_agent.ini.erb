@@ -11,7 +11,7 @@ interface_driver = quantum.agent.linux.interface.OVSInterfaceDriver
 #interface_driver = quantum.agent.linux.interface.BridgeInterfaceDriver
 
 # The Quantum user information for accessing the Quantum API.
-auth_url = http://<%= @control_host %>:35357/v2.0
+auth_url = http://<%= @keystone_host %>:35357/v2.0
 auth_region = <%= @region %>
 admin_tenant_name = <%= @service_tenant_name %>
 admin_user = <%= @service_user_name %>

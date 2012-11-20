@@ -142,7 +142,7 @@ done
 # create test vm
 control_ip=$(knife search node roles:openstack-control | awk '/^IP/{print $2}')
 function _compute_up() {
-	test $(do_ssh $control_ip nova-manage service list 2>&1 | grep nova-compute | grep -c ':-)') == "$compute_count"
+	test $(do_ssh $control_ip nova-manage service list 2>&1 | grep nova-compute | grep -c ':-)') -ge "$compute_count"
 }
 wait_for _compute_up "wait for nova-compute up..." 5
 
