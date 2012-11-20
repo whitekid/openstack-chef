@@ -50,8 +50,8 @@ http://uec-images.ubuntu.com/releases/quantal/release-20121017/ubuntu-12.10-serv
 
 images=%w{
 http://192.168.100.108:8080/uec-images/cirros-0.3.0-x86_64-disk.img
-http://192.168.100.108:8080/uec-images/releases/precise/20121119/ubuntu-12.04-server-cloudimg-amd64-disk1.img
-http://192.168.100.108:8080/uec-images/releases/quantal/20121118/ubuntu-12.10-server-cloudimg-amd64-disk1.img
+http://192.168.100.108:8080/uec-images/releases/precise/20121026.1/ubuntu-12.04-server-cloudimg-amd64-disk1.img
+http://192.168.100.108:8080/uec-images/releases/quantal/20121017/ubuntu-12.10-server-cloudimg-amd64-disk1.img
 }
 
 images.each do |image|

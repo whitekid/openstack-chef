@@ -176,13 +176,13 @@ images = [
 	# Ubuntu 12.04 cloud image
 	{
 		"name" => 'ubuntu-12.04-server-cloudimg-amd64',
-		"url" => "#{bag['cache_host']}/uec-images/releases/precise/20121119/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
+		"url" => "#{bag['cache_host']}/uec-images/releases/precise/20121026.1/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
 		"checksum" => "030a4451f5968ee26d3d75b7759e0d8c",
 	},
 	# Ubuntu 12.10 cloud image
 	{
 		"name" => 'ubuntu-12.10-server-cloudimg-amd64',
-		"url" => "#{bag['cache_host']}/uec-images/releases/quantal/20121118/ubuntu-12.10-server-cloudimg-amd64-disk1.img",
+		"url" => "#{bag['cache_host']}/uec-images/releases/quantal/20121017/ubuntu-12.10-server-cloudimg-amd64-disk1.img",
 		"checksum" => "ba66e7e4f7eb9967fe044c808e92700a",
 	},
 ]
