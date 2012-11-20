@@ -38,9 +38,9 @@ services and endpoints:
       type:         identity
       description:  Keystone Identity Service
       region:       RegionOne
-      publicurl:    http://<%= @control_host %>:5000/v2.0
-      internalurl:  http://<%= @control_host %>:5000/v2.0
-      adminurl:     http://<%= @control_host %>:35357/v2.0
+      publicurl:    http://<%= @keystone_host %>:5000/v2.0
+      internalurl:  http://<%= @keystone_host %>:5000/v2.0
+      adminurl:     http://<%= @keystone_host %>:35357/v2.0
 
     - name:         nova
       type:         compute

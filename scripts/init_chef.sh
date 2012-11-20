@@ -103,6 +103,7 @@ for vm in $vms; do
 			run_list="role[keystone-server]"
 			;;
 		"control.${domain}")
+			required_role='keystone-server'
 			run_list="role[openstack-control]"
 			;;
 		"c-vol.${domain}")
