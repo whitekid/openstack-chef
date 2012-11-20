@@ -66,7 +66,7 @@ for vm in $vms; do
 	# bootstrap chef
 	ip=`echo $vm | cut -d : -f 2`
 
-	wait_for "do_ssh $ip echo 2>&1" "waiting $node($ip) to boot up..." 3
+	wait_for "do_ssh $ip echo 2>&1 > /dev/null" "waiting $ip to boot up..." 3
 
 	do_ssh $ip rm -rf /etc/chef
 	node="$(do_ssh $ip hostname -f)"
