@@ -30,7 +30,7 @@ template "/etc/quantum/api-paste.ini" do
 	group "quantum"
 	source "api-paste.ini.erb"
 	variables({
-		"keysthone_host" => keystone_host,
+		"keystone_host" => keystone_host,
 		"service_tenant_name" => 'service',
 		"service_user_name" => 'quantum',
 		"service_user_passwd" => bag['keystone']['quantum_passwd'],
