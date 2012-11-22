@@ -8,7 +8,7 @@ fi
 
 vm_revert=${vm_revert:-true}
 vm_snapshot=${vm_snapshot:-os_setup}
-vm_create=true
+vm_create=${vm_create:-true}
 chef_bootstrap=${chef_bootstrap:-apt}
 compute_count=${compute_count:-2}
 
@@ -40,9 +40,6 @@ function sync_clock() {
 }
 
 # restore vm
-vm_revert=${vm_revert:-true}
-vm_snapshot=${vm_snapshot:-created}
-
 function _revert_vm() {
 	vm=$1
 
