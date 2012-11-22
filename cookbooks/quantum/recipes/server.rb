@@ -5,7 +5,7 @@ packages(%w{quantum-server quantum-plugin-openvswitch})
 services(%w{quantum-server})
 
 bag = data_bag_item('openstack', 'default')
-keysthone_host = get_roled_host('keystone-server')
+keystone_host = get_roled_host('keystone-server')
 db_node = get_roled_node('openstack-database')
 
 connection = connection_string('quantum', 'quantum', db_node['mysql']['openstack_passwd']['quantum'])
@@ -30,7 +30,7 @@ template "/etc/quantum/api-paste.ini" do
 	group "quantum"
 	source "api-paste.ini.erb"
 	variables({
-		"keysthone_host" => keysthone_host,
+		"keysthone_host" => keystone_host,
 		"service_tenant_name" => 'service',
 		"service_user_name" => 'quantum',
 		"service_user_passwd" => bag['keystone']['quantum_passwd'],

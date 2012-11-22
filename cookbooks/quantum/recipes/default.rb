@@ -5,7 +5,6 @@ end
 package "quantum-common"
 
 bag = data_bag_item('openstack', 'default')
-control_host = get_roled_host('openstack-control')
 rabbit_host = get_roled_host('openstack-rabbitmq')
 
 template "/etc/quantum/quantum.conf" do
