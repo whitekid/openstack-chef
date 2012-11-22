@@ -1,7 +1,7 @@
 install
 text
-url --url "http://<%= @mirror_host %>/<%= @mirror_path %>/<%= @release %>/os/<%= @arch %>/"
-repo --name updates --baseurl="http://<%= @mirror_host %>/<%= @mirror_path %>/<%= @release %>/updates/<%= @arch %>/"
+url --url "<%= @repo %>/<%= @release %>/os/<%= @arch %>/"
+repo --name updates --baseurl="<%= @repo %>/<%= @release %>/updates/<%= @arch %>/"
 
 lang en_US.UTF-8
 keyboard us

@@ -19,6 +19,18 @@
 
 include_recipe "apt"
 
+class Chef::Recipe
+	include Helper
+end
+
+repo_node = get_roled_node('repo')
+
+case node[:platform]
+when "ubuntu"
+	node.set[:ubuntu][:archive_url]  = "http://#{repo_node[:ipaddress]}/#{repo_node[:repo][:ubuntu][:pkg_path]}"
+	node.set[:ubuntu][:security_url] = "http://#{repo_node[:ipaddress]}/#{repo_node[:repo][:ubuntu][:pkg_path]}"
+end
+
 template "/etc/apt/sources.list" do
   mode 0644
   variables :code_name => node[:lsb][:codename]

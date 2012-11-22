@@ -1,0 +1,86 @@
+############# config ##################
+#
+# set base_path    /var/spool/apt-mirror
+#
+# set mirror_path  $base_path/mirror
+# set skel_path    $base_path/skel
+# set var_path     $base_path/var
+# set cleanscript $var_path/clean.sh
+# set defaultarch  <running host architecture>
+# set postmirror_script $var_path/postmirror.sh
+# set run_postmirror 0
+set nthreads     20
+set _tilde 0
+#
+############# end config ##############
+
+#deb http://archive.ubuntu.com/ubuntu precise main restricted universe multiverse
+#deb http://archive.ubuntu.com/ubuntu precise-security main restricted universe multiverse
+#deb http://archive.ubuntu.com/ubuntu precise-updates main restricted universe multiverse
+##deb http://archive.ubuntu.com/ubuntu precise-proposed main restricted universe multiverse
+##deb http://archive.ubuntu.com/ubuntu precise-backports main restricted universe multiverse
+#
+#deb-src http://archive.ubuntu.com/ubuntu precise main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu precise-security main restricted universe multiverse
+#deb-src http://archive.ubuntu.com/ubuntu precise-updates main restricted universe multiverse
+##deb-src http://archive.ubuntu.com/ubuntu precise-proposed main restricted universe multiverse
+##deb-src http://archive.ubuntu.com/ubuntu precise-backports main restricted universe multiverse
+#
+#clean http://archive.ubuntu.com/ubuntu
+
+####
+<% @mirrors.each do | site, specs | -%>
+  <% specs.each do | spec | -%>
+<%= spec.slice!(0) %> <%= site %> <%= spec.join(' ') %>
+  <% end %>
+clean <%= site %>
+
+<% end %>
+####
+#
+#deb-amd64 http://apt.opscode.com precise-0.10 main testing
+#deb-amd64 http://apt.opscode.com quantal-0.10 main testing
+#deb-i386 http://apt.opscode.com precise-0.10 main testing
+#deb-i386 http://apt.opscode.com quantal-0.10 main testing
+#clean http://apt.opscode.com
+#
+#deb-amd64 http://ubuntu-cloud.archive.canonical.com/ubuntu/ precise-updates/folsom main
+#deb-i386  http://ubuntu-cloud.archive.canonical.com/ubuntu/ precise-updates/folsom main
+#deb-amd64 http://ubuntu-cloud.archive.canonical.com/ubuntu/ precise-proposed/folsom main
+#deb-i386  http://ubuntu-cloud.archive.canonical.com/ubuntu/ precise-proposed/folsom main
+#clean http://ubuntu-cloud.archive.canonical.com/ubuntu
+#
+## ubuntu precise
+#deb-amd64 http://ftp.daum.net/ubuntu/ precise           main multiverse universe restricted main/debian-installer
+#deb-i386  http://ftp.daum.net/ubuntu/ precise           main multiverse universe restricted main/debian-installer
+#deb-src   http://ftp.daum.net/ubuntu/ precise           main multiverse universe restricted
+#deb-amd64 http://ftp.daum.net/ubuntu/ precise-updates   main multiverse universe restricted main/debian-installer
+#deb-i386  http://ftp.daum.net/ubuntu/ precise-updates   main multiverse universe restricted main/debian-installer
+#deb-src   http://ftp.daum.net/ubuntu/ precise-updates   main multiverse universe restricted
+#deb-amd64 http://ftp.daum.net/ubuntu/ precise-security  main multiverse universe restricted main/debian-installer
+#deb-i386  http://ftp.daum.net/ubuntu/ precise-security  main multiverse universe restricted main/debian-installer
+#deb-src   http://ftp.daum.net/ubuntu/ precise-security  main multiverse universe restricted
+#deb-amd64 http://ftp.daum.net/ubuntu/ precise-proposed  main multiverse universe restricted main/debian-installer
+#deb-i386  http://ftp.daum.net/ubuntu/ precise-proposed  main multiverse universe restricted main/debian-installer
+#deb-src   http://ftp.daum.net/ubuntu/ precise-proposed  main multiverse universe restricted
+#deb-amd64 http://ftp.daum.net/ubuntu/ precise-backports main multiverse universe restricted main/debian-installer
+#deb-i386  http://ftp.daum.net/ubuntu/ precise-backports main multiverse universe restricted main/debian-installer
+#deb-src   http://ftp.daum.net/ubuntu/ precise-backports main multiverse universe restricted
+#
+#deb-amd64 http://ftp.daum.net/ubuntu/ quantal           main multiverse universe restricted main/debian-installer
+#deb-i386  http://ftp.daum.net/ubuntu/ quantal           main multiverse universe restricted main/debian-installer
+#deb-src   http://ftp.daum.net/ubuntu/ quantal           main multiverse universe restricted
+#deb-amd64 http://ftp.daum.net/ubuntu/ quantal-updates   main multiverse universe restricted main/debian-installer
+#deb-i386  http://ftp.daum.net/ubuntu/ quantal-updates   main multiverse universe restricted main/debian-installer
+#deb-src   http://ftp.daum.net/ubuntu/ quantal-updates   main multiverse universe restricted
+#deb-amd64 http://ftp.daum.net/ubuntu/ quantal-security  main multiverse universe restricted main/debian-installer
+#deb-i386  http://ftp.daum.net/ubuntu/ quantal-security  main multiverse universe restricted main/debian-installer
+#deb-src   http://ftp.daum.net/ubuntu/ quantal-security  main multiverse universe restricted
+#deb-amd64 http://ftp.daum.net/ubuntu/ quantal-proposed  main multiverse universe restricted main/debian-installer
+#deb-i386  http://ftp.daum.net/ubuntu/ quantal-proposed  main multiverse universe restricted main/debian-installer
+#deb-src   http://ftp.daum.net/ubuntu/ quantal-proposed  main multiverse universe restricted
+#deb-amd64 http://ftp.daum.net/ubuntu/ quantal-backports main multiverse universe restricted main/debian-installer
+#deb-i386  http://ftp.daum.net/ubuntu/ quantal-backports main multiverse universe restricted main/debian-installer
+#deb-src   http://ftp.daum.net/ubuntu/ quantal-backports main multiverse universe restricted
+#
+#clean http://ftp.daum.net/ubuntu/

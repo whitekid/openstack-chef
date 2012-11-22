@@ -6,6 +6,12 @@ if [ -f "$dir/init_chef.rc" ]; then
 	source "$dir/init_chef.rc"
 fi
 
+vm_revert=${vm_revert:-true}
+vm_snapshot=${vm_snapshot:-os_setup}
+vm_create=true
+chef_bootstrap=${chef_bootstrap:-apt}
+compute_count=${compute_count:-2}
+
 function do_ssh(){
 	sshpass -pchoe ssh root@$@
 }
@@ -66,7 +72,7 @@ for vm in $vms; do
 	# bootstrap chef
 	ip=`echo $vm | cut -d : -f 2`
 
-	wait_for "do_ssh $ip echo 2>&1 > /dev/null" "waiting $ip to boot up..." 3
+	wait_for "do_ssh $ip echo 2>&1 > /dev/null" "waiting $ip to boot up..." 5
 
 	do_ssh $ip rm -rf /etc/chef
 	node="$(do_ssh $ip hostname -f)"
@@ -140,13 +146,15 @@ done
 
 
 # create test vm
-control_ip=$(knife search node roles:openstack-control | awk '/^IP/{print $2}')
-function _compute_up() {
-	test $(do_ssh $control_ip nova-manage service list 2>&1 | grep nova-compute | grep -c ':-)') -ge "$compute_count"
-}
-wait_for _compute_up "wait for nova-compute up..." 5
+if [ "$vm_create" == "true" ]; then
+	control_ip=$(knife search node roles:openstack-control | awk '/^IP/{print $2}')
+	function _nova_compute_up() {
+		test $(do_ssh $control_ip nova-manage service list 2>&1 | grep nova-compute | grep -c ':-)') -ge "$compute_count"
+	}
+	wait_for _nova_compute_up "wait for nova-compute up..." 5
 
-# launch vm
-do_ssh $control_ip ". openrc admin ; bin/vm_create.sh test0; until ping -c 3 172.16.1.3; do sleep 3; done"
+	# launch vm
+	do_ssh $control_ip ". openrc admin ; bin/vm_create.sh test0; until ping -c 3 172.16.1.3; do sleep 3; done"
+fi
 
 # vim: nu ai ts=4 sw=4

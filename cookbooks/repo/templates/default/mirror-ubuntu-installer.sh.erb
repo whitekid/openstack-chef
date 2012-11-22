@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+dest="<%= @dest %>"
+base="<%= @src %>"
+
+srcs+="dists/precise/main/installer-amd64/ "
+srcs+="dists/precise/main/installer-i386/ "
+srcs+="dists/quantal/main/installer-amd64/ "
+srcs+="dists/quantal/main/installer-i386/ "
+
+for src in $srcs; do
+	mkdir -p $dest/$src
+	rsync -azHv --delete \
+		${base}/${src} $dest/$src
+done
+

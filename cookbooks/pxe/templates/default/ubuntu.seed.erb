@@ -13,8 +13,8 @@ d-i netcfg/get_domain string unassigned-domain
 d-i netcfg/wireless_wep string
 
 d-i mirror/country string manual
-d-i mirror/http/hostname string <%= @mirror_host %>
-d-i mirror/http/directory string <%= @mirror_path %>
+d-i mirror/http/hostname string <%= @repo_host %>
+d-i mirror/http/directory string <%= @repo_dir %>
 d-i mirror/http/proxy string
 
 d-i clock-setup/utc boolean true

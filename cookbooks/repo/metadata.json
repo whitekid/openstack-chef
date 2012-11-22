@@ -1,0 +1,30 @@
+{
+  "replacing": {
+  },
+  "groupings": {
+  },
+  "providing": {
+  },
+  "dependencies": {
+    "nginx": ">= 0.0.0"
+  },
+  "version": "0.1.0",
+  "attributes": {
+  },
+  "conflicting": {
+  },
+  "maintainer_email": "YOUR_EMAIL",
+  "name": "repo",
+  "platforms": {
+  },
+  "recipes": {
+  },
+  "suggestions": {
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "description": "Installs/Configures repo",
+  "recommendations": {
+  },
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "license": "All rights reserved"
+}

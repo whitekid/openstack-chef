@@ -1,9 +1,10 @@
-vm_revert=true
-vm_snapshot=os_setup
-chef_bootstrap=apt
-compute_count=2
+#vm_revert=true
+#vm_snapshot=os_setup
+#vm_create=true
+#chef_bootstrap=apt
+#compute_count=3
 
-vm_path="/home/choe/vmware/openstack"
+vm_path="/home/choe/ssd/vmware/openstack"
 vms+="${vm_path}/database/database.vmx:10.20.1.4 "
 vms+="${vm_path}/keystone/keystone.vmx:10.20.1.8 "
 vms+="${vm_path}/control/control.vmx:10.20.1.6 "

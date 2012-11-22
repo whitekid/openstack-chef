@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+if [ -d /root/bin/mirror.d ]; then
+  for i in /root/bin/mirror.d/*.sh; do
+    if [ -r $i ]; then
+      . $i
+    fi
+  done
+  unset i
+fi
+# vim: nu ai ts=4 sw=4

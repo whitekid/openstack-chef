@@ -1,3 +1,11 @@
+class Chef::Recipe
+	include Helper
+end
+
+include_recipe "nginx"
+repo_node = get_roled_node('repo')
+
+# copy pxelinux to tftp
 config_dir = "#{node['tftp']['directory']}/pxelinux.cfg"
 
 directory config_dir
@@ -20,10 +28,10 @@ template "#{config_dir}/default" do
 	})
 end
 
-eth0 = node["network"]["interfaces"]["eth0"]["addresses"].select { |address, data| data["family"] == "inet" }[0][0]
 bag = data_bag_item('hosts', 'default')
 
 node[:pxe][:items].each do |item|
+	# @note
 	# netboot 파일을 다운받아서 하면 CD 이미지와 커널 모듈 버전이 안맞는다고 나온다.
 	# 따라서 CD의 netboot 이미지를 가지고 설정한다.
 	pxe_image_dir = "#{node[:tftp][:directory]}/images/#{item[:id]}"
@@ -37,9 +45,9 @@ node[:pxe][:items].each do |item|
 		source "pxelinux.cfg-#{item[:platform]}.erb"
 		mode "0644"
 		variables({
-			:id => item["id"],
-			:arch => item["arch"],
-			:ipaddr => bag['properties']['pxe_image_host'],
+			:id => item[:id],
+			:arch => item[:arch],
+			:ipaddr => node[:ipaddress],
 		})
 	end
 
@@ -49,18 +57,17 @@ node[:pxe][:items].each do |item|
 		files = %w{ linux initrd.gz }
 		dir = "install/netboot/ubuntu-installer/#{item[:arch]}"
 
-		url_base = "http://#{item[:mirror_host]}/#{item[:mirror_path]}/dists/#{item[:release]}/main/installer-#{item[:arch]}/current/images/netboot/ubuntu-installer/#{item[:arch]}"
+		url_base = "http://#{repo_node[:ipaddress]}/#{repo_node[:repo][:ubuntu][:pxe_linux_path]}/dists/#{item[:release]}/main/installer-#{item[:arch]}/current/images/netboot/ubuntu-installer/#{item[:arch]}"
 
 	when 'centos'
 		files = %w{ vmlinuz initrd.img }
 		dir = "images/pxeboot"
-		url_base = "http://#{item[:mirror_host]}/centos/#{item[:release]}/os/#{item[:arch]}/images/pxeboot"
+		url_base = "#{repo_node[:repo][:centos][:url]}/#{item[:release]}/os/#{item[:arch]}/images/pxeboot"
 	end
 
 	files.each do |f|
 		execute "#{pxe_image_dir}/#{f}" do
 			command "wget -c -O #{pxe_image_dir}/#{f} #{url_base}/#{f}"
-			only_if "ping #{bag['properties']['pxe_image_host']} -c 1"
 		end
 	end
 end
@@ -78,5 +85,38 @@ data_bag_item('hosts', 'default')['subnets'].each do |subnet|
 		end
 	end
 end
+
+# kickstart, debootstrap file
+node[:pxe][:items].each do |item|
+	install_image_dir = "#{wwwroot}/images/#{item[:id]}"
+
+	directory "#{wwwroot}/ks/"
+
+	case item[:platform]
+	when 'centos' # kickstart for centos
+		template "#{wwwroot}/ks/#{item[:id]}.ks" do
+			source "#{item[:platform]}.ks.erb"
+			mode "0644"
+			variables({
+				:repo => repo_node[:repo][:centos][:url],
+				:release => item[:release],
+				:arch => item[:arch],
+				:packages => item[:packages],
+				:post_script => item[:post_script]
+			})
+		end
+	when 'ubuntu'	# preceed for ubuntu
+		template "#{wwwroot}/ks/#{item[:id]}.seed" do
+			source "#{item[:platform]}.seed.erb"
+			mode "0644"
+			variables({
+				:packages => item[:packages],
+				:repo_host => repo_node[:ipaddress],
+				:repo_dir => repo_node[:repo][:ubuntu][:pkg_path],
+			})
+		end
+	end
+end
+
 
 # vim: ts=4 nu sw=4 ai

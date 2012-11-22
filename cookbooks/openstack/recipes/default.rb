@@ -10,6 +10,7 @@ class Chef::Recipe
 	include Helper
 end
 
+repo_node = get_roled_node('repo')
 
 # @note 현재 패키지에는 folsom이 들어가 있다.
 # 하지만 testing 패키지 말고는 완전히 테스트 되지 않았음
@@ -46,7 +47,8 @@ when :cloud_archive
 	apt_repository "openstack-folsom" do
 		#uri "http://ubuntu-cloud.archive.canonical.com/ubuntu #{node['lsb']['codename']}-updates/#{cloud_archive_version}"
 		# @note cloud archive mirroring: see...
-		uri "http://192.168.100.108:8080/apt-mirror/ubuntu-cloud.archive.canonical.com/ubuntu #{node['lsb']['codename']}-updates/#{cloud_archive_version}"
+		# @note cloud archive mirroring: see...
+		uri "#{repo_node[:repo][:ubuntu][:cloud_archive]} #{node['lsb']['codename']}-updates/#{cloud_archive_version}"
 		components ["main"]
 	end
 end

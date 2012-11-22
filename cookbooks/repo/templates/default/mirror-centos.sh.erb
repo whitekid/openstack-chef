@@ -1,0 +1,21 @@
+#!/bin/bash
+rsync -azHv --delete \
+	--exclude "/2*" \
+	--exclude "/3*" \
+	--exclude "/4*" \
+	--exclude "/5*" \
+	--exclude "/6.0" \
+	--exclude "/6.1" \
+	--exclude "/6.2" \
+	--exclude "/6.3/fasttrack" \
+	--exclude "/6.3/isos" \
+	--exclude "/6.3/contrib" \
+	--exclude "/6.3/cr" \
+	--exclude "/6.3/extras" \
+	--exclude "/6.3/centosplus" \
+	--exclude "*/drpms" \
+	--exclude "/build" \
+	--exclude "/dostools" \
+	--exclude "/graphics" \
+	--exclude "/HEADER.images" \
+	<%= @src %> <%= @dest %>

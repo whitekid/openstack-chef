@@ -1,0 +1,55 @@
+#!/bin/bash
+set -e
+
+IMAGES=""
+target="<%= @mirror_dir %>/cloud-images/cirros"
+
+# cirros
+images=""
+<% @cirros.each do |img, prop| -%>
+images+="https://launchpad.net/cirros/trunk/<%= img %>,<%= prop[:md5sum] %> "
+<% end %>
+for image in $images; do
+	img=`echo $image | cut -d , -f 1`
+	IMAGES+="$target/`basename $img`,$image "
+done
+
+
+# ubuntu cloud images
+target="<%= @mirror_dir %>/cloud-images/uec-images"
+base="http://uec-images.ubuntu.com/releases"
+
+images=""
+<% @uec.each do |img, prop| -%>
+images+="<%= img %>,<%= prop[:md5sum] %> "
+<% end %>
+
+for image in $images; do
+	img=`echo $image | cut -d , -f 1`
+	src="$base/$image"
+	dest="$target/$img"
+
+	IMAGES+="$dest,$src "
+done
+
+for image in $IMAGES; do
+	dest=`echo "$image" | cut -d , -f 1`
+	src=`echo "$image" | cut -d , -f 2`
+	md5sum=`echo "$image" | cut -d , -f 3`
+
+	mkdir -p `dirname $dest`
+
+	# check md5sum
+	if [ -f $dest ]; then
+		if [ "`md5sum $dest | awk '{print \$1}'`" != $md5sum ]; then
+			rm -f $dest
+		fi
+	fi
+
+	# download it
+	if [ ! -f $dest ]; then
+		wget -c -O $dest $src 
+	fi
+done
+
+# vim: nu ai ts=4 sw=4
