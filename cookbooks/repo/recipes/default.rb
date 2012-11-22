@@ -41,7 +41,10 @@ node.set['repo']['ubuntu']['chef'] = "#{node['repo']['ubuntu']['pkg_mirror_base'
 
 # Ubuntu pxelinux
 dest = "#{mirror_dir}/ubuntu"
-directory dest
+directory dest do
+	recursive true
+end
+
 template "#{mirror_d}/mirror-ubuntu-installer.sh" do
 	source "mirror-ubuntu-installer.sh.erb"
 	mode "0755"
@@ -50,6 +53,9 @@ template "#{mirror_d}/mirror-ubuntu-installer.sh" do
 		"dest" => dest,
 	})
 end
+
+directory "#{www_dir}/mirror"
+directory "#{mirror_dir}/ubuntu"
 
 link "#{www_dir}/mirror/ubuntu" do
 	to "#{mirror_dir}/ubuntu"
