@@ -5,8 +5,6 @@ end
 packages(%w{quantum-dhcp-agent})
 services(%w{quantum-dhcp-agent})
 
-bag = data_bag_item('openstack', 'default')
-
 template "/etc/quantum/dhcp_agent.ini" do
 	mode "0644"
 	owner "quantum"
