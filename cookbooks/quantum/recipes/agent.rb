@@ -7,7 +7,6 @@ services(%w{openvswitch-switch quantum-plugin-openvswitch-agent})
 
 bag = data_bag_item('openstack', 'default')
 
-control_host = get_roled_host('openstack-control')
 db_node = get_roled_node('openstack-database')
 rabbit_host = get_roled_host('openstack-rabbitmq')
 
