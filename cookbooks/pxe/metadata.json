@@ -1,32 +1,32 @@
 {
-  "replacing": {
+  "groupings": {
   },
-  "maintainer": "YOUR_COMPANY_NAME",
-  "attributes": {
-  },
-  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
-  "description": "Installs/Configures pxe",
-  "name": "pxe",
-  "dependencies": {
-    "tftp": ">= 0.0.0",
-    "nginx": ">= 0.0.0",
-    "openstack": ">= 0.0.0"
+  "version": "0.1.0",
+  "recommendations": {
   },
   "license": "All rights reserved",
   "recipes": {
   },
-  "providing": {
+  "attributes": {
   },
-  "maintainer_email": "YOUR_EMAIL",
-  "groupings": {
+  "replacing": {
   },
   "platforms": {
   },
+  "maintainer_email": "YOUR_EMAIL",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
   "suggestions": {
   },
-  "version": "0.1.0",
+  "name": "pxe",
+  "providing": {
+  },
   "conflicting": {
   },
-  "recommendations": {
-  }
+  "dependencies": {
+    "nginx": ">= 0.0.0",
+    "whitekid": ">= 0.0.0",
+    "tftp": ">= 0.0.0"
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "description": "Installs/Configures pxe"
 }

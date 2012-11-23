@@ -1,6 +1,4 @@
-class Chef::Recipe
-	include Helper
-end
+::Chef::Recipe.send(:include, Whitekid::Helper)
 
 include_recipe "nginx"
 repo_node = get_roled_node('repo')
