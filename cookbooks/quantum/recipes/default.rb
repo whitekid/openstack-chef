@@ -1,6 +1,4 @@
-class Chef::Recipe
-	include Helper
-end
+::Chef::Recipe.send(:include, Whitekid::Helper)
 
 package "quantum-common"
 

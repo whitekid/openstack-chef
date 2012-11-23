@@ -6,3 +6,5 @@ version           "0.99.0"
 depends           "apt"
 supports          "ubuntu"
 recipe            "ubuntu", "Sets up sources for the node's ubuntu release"
+
+depends "whitekid"

@@ -16,12 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+::Chef::Recipe.send(:include, Whitekid::Helper)
 
 include_recipe "apt"
-
-class Chef::Recipe
-	include Helper
-end
 
 repo_node = get_roled_node('repo')
 

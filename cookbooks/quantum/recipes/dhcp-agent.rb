@@ -1,7 +1,3 @@
-class Chef::Recipe
-	include Helper
-end
-
 packages(%w{quantum-dhcp-agent})
 services(%w{quantum-dhcp-agent})
 

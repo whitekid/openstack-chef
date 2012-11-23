@@ -1,7 +1,5 @@
-class Chef::Recipe
-	include Helper
-end
-
+::Chef::Recipe.send(:include, Whitekid::Helper)
+::Chef::Recipe.send(:include, Openstack::Helper)
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
 bag = data_bag_item('openstack', 'default')

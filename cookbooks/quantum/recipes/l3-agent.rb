@@ -1,6 +1,4 @@
-class Chef::Recipe
-	include Helper
-end
+::Chef::Recipe.send(:include, Whitekid::Helper)
 
 packages(%w{quantum-l3-agent})
 services(%w{quantum-l3-agent})

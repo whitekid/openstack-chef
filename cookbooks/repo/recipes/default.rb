@@ -25,6 +25,10 @@ template "/etc/apt/mirror.list" do
 	})
 end
 
+template "/etc/cron.d/apt-mirror" do
+	source "apt-mirror.cron.erb"
+end
+
 link "#{www_dir}/apt-mirror" do
 	to "#{spool_dir}/apt-mirror/mirror"
 end

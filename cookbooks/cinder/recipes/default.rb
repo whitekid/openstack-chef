@@ -7,9 +7,8 @@
 # All rights reserved - Do Not Redistribute
 #
 
-class Chef::Recipe
-	include Helper
-end
+::Chef::Recipe.send(:include, Whitekid::Helper)
+::Chef::Recipe.send(:include, Openstack::Helper)
 
 # cinder default settings
 packages(%w{cinder-common})

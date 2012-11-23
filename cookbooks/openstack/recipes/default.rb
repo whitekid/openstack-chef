@@ -6,9 +6,7 @@
 #
 # All rights reserved - Do Not Redistribute
 #
-class Chef::Recipe
-	include Helper
-end
+::Chef::Recipe.send(:include, Whitekid::Helper)
 
 repo_node = get_roled_node('repo')
 

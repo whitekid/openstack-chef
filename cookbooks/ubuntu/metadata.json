@@ -1,36 +1,33 @@
 {
-  "name": "ubuntu",
-  "description": "Sets up sources for ubuntu",
-  "long_description": "",
-  "maintainer": "Opscode, Inc.",
-  "maintainer_email": "cookbooks@opscode.com",
-  "license": "Apache 2.0",
-  "platforms": {
-    "ubuntu": [
-
-    ]
-  },
-  "dependencies": {
-    "apt": [
-
-    ]
-  },
-  "recommendations": {
-  },
+  "version": "0.99.0",
   "suggestions": {
   },
+  "description": "Sets up sources for ubuntu",
   "conflicting": {
+  },
+  "maintainer_email": "cookbooks@opscode.com",
+  "long_description": "",
+  "name": "ubuntu",
+  "recommendations": {
   },
   "providing": {
   },
-  "replacing": {
-  },
-  "attributes": {
-  },
-  "groupings": {
-  },
+  "maintainer": "Opscode, Inc.",
   "recipes": {
     "ubuntu": "Sets up sources for the node's ubuntu release"
   },
-  "version": "0.99.0"
+  "dependencies": {
+    "apt": ">= 0.0.0",
+    "whitekid": ">= 0.0.0"
+  },
+  "license": "Apache 2.0",
+  "groupings": {
+  },
+  "platforms": {
+    "ubuntu": ">= 0.0.0"
+  },
+  "attributes": {
+  },
+  "replacing": {
+  }
 }

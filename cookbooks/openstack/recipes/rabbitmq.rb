@@ -1,7 +1,3 @@
-class Chef::Recipe
-	include Helper
-end
-
 bag = data_bag_item('openstack', 'default')
 
 package "rabbitmq-server"

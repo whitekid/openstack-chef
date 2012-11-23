@@ -1,6 +1,5 @@
-class Chef::Recipe
-	include Helper
-end
+::Chef::Recipe.send(:include, Whitekid::Helper)
+::Chef::Recipe.send(:include, Openstack::Helper)
 
 packages(%w{nova-compute openvswitch-switch quantum-plugin-openvswitch-agent})
 services(%w{nova-compute openvswitch-switch quantum-plugin-openvswitch-agent libvirt-bin})
