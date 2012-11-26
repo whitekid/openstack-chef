@@ -35,7 +35,7 @@ module Whitekid
 			end
 		end
 
-		def iface_addr(iface)
+		def iface_addr(node, iface)
 			return node["network"]["interfaces"][iface]["addresses"].select { |address, data| data["family"] == "inet" }[0][0]
 		end
 	end

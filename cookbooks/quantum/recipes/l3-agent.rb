@@ -16,6 +16,7 @@ execute "apply fetch" do
 end
 
 bag = data_bag_item('openstack', 'default')
+metadata_ip = iface_addr(get_roled_node('openstack-controller'), 'eth1')
 
 # setup interface
 execute "external nic bring up" do
@@ -34,7 +35,8 @@ template "/etc/quantum/l3_agent.ini" do
 	source "l3_agent.ini.erb"
 	variables({
 		"keystone_host" => keystone_host,
-		"metadata_ip" => bag['metadata_ip'],
+		# @todo metadata_ip는 controller의 eth1이다.!!!
+		"metadata_ip" => metadata_ip,
 		"region" => 'RegionOne',
 		"service_tenant_name" => 'service',
 		"service_user_name" => 'quantum',
