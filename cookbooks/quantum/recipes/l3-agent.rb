@@ -16,7 +16,7 @@ execute "apply fetch" do
 end
 
 bag = data_bag_item('openstack', 'default')
-metadata_ip = iface_addr(get_roled_node('openstack-controller'), 'eth1')
+metadata_ip = iface_addr(get_roled_node('openstack-control'), 'eth1')
 
 # setup interface
 execute "external nic bring up" do
