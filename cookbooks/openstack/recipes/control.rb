@@ -21,34 +21,8 @@ route "172.16.0.0/16" do
 end
 
 
-#
-# Keystone client
-#
-#packages(%w{"keystone"})
-#services(%w{keystone})
-#
-#node.set_unless['keystone']['admin_token'] = secure_password
-#
-#connection = connection_string('keystone', 'keystone', db_node['mysql']['openstack_passwd']['keystone'])
-#template "/etc/keystone/keystone.conf" do
-#	mode "0644"
-#	source "control/keystone.conf.erb"
-#	variables({
-#		"connection" => connection,
-#		"admin_token" => node['keystone']['admin_token'],
-#	})
-#
-#	# @note: 여기서 재시작하지 않으면 keystone-init에서 오류가 발생함
-#	notifies :restart, "service[keystone]", :immediately
-#end
-#
-#package "python-mysqldb"
-#execute "keystone db sync" do
-#	command "keystone-manage db_sync"
-#end
-
-
 # create tenants, user, service, endpoints
+package "python-setuptools"
 package "python-yaml"
 template "/root/keystone-init.py" do
 	mode "0755"
@@ -209,7 +183,20 @@ include_recipe "cinder"
 #
 # nova-services
 #
-# @todo nova-compute의 경우는 mysql에 접속하지 못하면 바로 에러를 내고 종료해버린다. 따라서 이 부분이 상당히 압에서 진행해야할 거 같다.
+package "python-nova" do
+	only_if { node[:openstack][:apply_metadata_proxy_patch] }
+end
+
+execute "apply metadata proxy fetch" do
+	action :nothing
+
+	command "wget -O - -q 'https://github.com/whitekid/nova/compare/stable/folsom...whitekid:stable-folsom-metadata_agent.patch' | patch -p1 -f || true"
+	cwd "/usr/lib/python2.7/dist-packages"
+
+	subscribes :run, "package[python-nova]", :immediately
+	only_if { node[:openstack][:apply_metadata_proxy_patch] }
+end
+
 packages(%w{nova-novncproxy novnc nova-api nova-ajax-console-proxy nova-cert nova-consoleauth nova-scheduler})
 services(%w{nova-api nova-cert nova-consoleauth nova-novncproxy nova-scheduler})
 
@@ -230,10 +217,12 @@ template "/etc/nova/nova.conf" do
 		"rabbit_host" => rabbit_host,
 		"rabbit_passwd" => bag['rabbit_passwd'],
 		# quantum
+		# @todo allow_overlapping_ip as quantum-api nodes attribute
 		"network_api_class" => "nova.network.quantumv2.api.API",
 		"quantum_tenant_name" => "service",
 		"quantum_user_name" => "quantum",
 		"quantum_user_passwd" => bag["keystone"]["quantum_passwd"],
+		:apply_metadata_proxy_patch => node[:openstack][:apply_metadata_proxy_patch],
 
 		# @note cinder를 사용하려면 nova-api에서 서비스하는 volume을 제거해야함
 		"enabled_apis" => "ec2,osapi_compute,metadata",
@@ -272,23 +261,6 @@ execute "wait for nova-api service startup" do
 	command "timeout 5 sh -c 'until wget http://#{control_host}:8774/ -O /dev/null -q; do sleep 1; done'"
 end
 
-
-#
-# Dashboard
-#
-packages(%w{openstack-dashboard})
-services(%w{apache2})
-
-template "/etc/openstack-dashboard/local_settings.py" do
-	mode "0644"
-	source "control/dashboard_local_settings.py.erb"
-	variables({
-		"cache_backend" => 'memcached://127.0.0.1:11211',
-		"swift_enabled" => "False",
-		"quantum_enabled" => "True",
-	})
-	notifies :restart, "service[apache2]"
-end
 
 #
 # utility scripts

@@ -151,6 +151,10 @@ notification_driver = quantum.openstack.common.notifier.list_notifier
 # Defined in list_notifier
 list_notifier_drivers = quantum.openstack.common.notifier.rabbit_notifier
 
+<% if @apply_metadata_proxy_patch %>
+metadata_proxy_shared_secret = secret
+<% end %>
+
 [QUOTAS]
 # resource name(s) that are supported in quota features
 # quota_items = network,subnet,port

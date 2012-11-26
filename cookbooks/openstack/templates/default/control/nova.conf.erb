@@ -39,6 +39,12 @@ enabled_apis=<%= @enabled_apis %>
 # for allow_overlapping_ip metadata proxy
 use_forwarded_for=true
 
+<% if @apply_metadata_proxy_patch %>
+service_quantum_metadata_proxy = true
+quantum_metadata_proxy_shared_secret = secret
+use_forwarded_for = true
+<% end %>
+
 [keystone_authtoken]
 auth_host = <%= @keystone_host %>
 auth_port = 35357

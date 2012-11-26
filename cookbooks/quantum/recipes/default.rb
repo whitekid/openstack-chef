@@ -14,7 +14,8 @@ template "/etc/quantum/quantum.conf" do
 		"rabbit_host" => rabbit_host,
 		"rabbit_passwd" => bag['rabbit_passwd'],
 		"rabbit_userid" => 'guest',
-		"allow_overlapping_ips" => node['openstack']['allow_overlapping_ips'],
+		:allow_overlapping_ips => node['quantum']['allow_overlapping_ips'],
+		:apply_metadata_proxy_patch => node[:quantum][:apply_metadata_proxy_patch],
 	})
 end
 

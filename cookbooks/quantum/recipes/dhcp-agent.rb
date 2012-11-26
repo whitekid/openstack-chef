@@ -7,7 +7,7 @@ template "/etc/quantum/dhcp_agent.ini" do
 	group "quantum"
 	source "dhcp_agent.ini.erb"
 	variables({
-		"use_namespaces" => node['openstack']['use_namespaces'],
+		:use_namespaces => node[:quantum][:use_namespaces],
 	})
 	notifies :restart, "service[quantum-dhcp-agent]"
 end

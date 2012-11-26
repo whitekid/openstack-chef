@@ -27,6 +27,7 @@
 				{ "hostname": "net-dhcp",		"mac": "00:50:56:24:6b:7a",	"ip": "10.20.1.202",	"os": "ubuntu-12.04-amd64" },
 				{ "hostname": "c-01-01",		"mac": "00:0c:29:ec:ad:58",	"ip": "10.20.1.10",		"os": "ubuntu-12.04-amd64" },
 				{ "hostname": "c-01-02",		"mac": "00:0c:29:53:53:f3",	"ip": "10.20.1.11",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "horizon",		"mac": "00:50:56:3e:73:37",	"ip": "10.20.1.9",		"os": "ubuntu-12.04-amd64" },
 				{ "hostname": "router-ext",		"mac": "00:50:56:3d:42:b3",	"ip": "10.20.1.250",	"os": "ubuntu-12.04-amd64" },
 				{ "hostname": "router-data",	"mac": "00:50:56:25:e3:cd",	"ip": "10.20.1.251",	"os": "ubuntu-12.04-amd64" },
 				{ "hostname": "devstack",		"mac": "00:50:56:38:4c:10",	"ip": "10.20.1.60",		"os": "ubuntu-12.04-amd64" }
