@@ -4,15 +4,23 @@ packages(%w{quantum-l3-agent})
 services(%w{quantum-l3-agent})
 
 # begin overlappingip-metadata proxy
-patch_applied = File.exists?('/usr/local/bin/quantum-metadata-agent')
-if node[:quantum][:apply_metadata_proxy_patch] and !patch_applied then
-	package "python-quantum"
-
+if node[:quantum][:apply_metadata_proxy_patch] then
 	execute "apply metadata proxy patch" do
 		command "wget -O - -q https://github.com/whitekid/quantum/commit/324e0cd977a4f779be260d7253435e49eed0bbbd.patch | patch -p1 -f || true"
 		cwd "/usr/lib/python2.7/dist-packages"
 	end
 
+	# setup services
+	template "/etc/init/quantum-metadata-agent.conf" do
+		mode "0644"
+		source "quantum-metadata-agent.conf.erb"
+	end
+
+	link "/etc/init.d/quantum-metadata-agent" do
+		to "/lib/init/upstart-job"
+	end
+
+	services(%w{quantum-metadata-agent})
 	%w{quantum-metadata-agent quantum-ns-metadata-proxy}.each do | script |
 		execute "set executable #{script}" do
 			command "chmod +x /usr/lib/python2.7/dist-packages/bin/#{script}"
@@ -21,6 +29,7 @@ if node[:quantum][:apply_metadata_proxy_patch] and !patch_applied then
 		link "/usr/local/bin/#{script}" do
 			mode "0766"
 			to "/usr/lib/python2.7/dist-packages/bin/#{script}"
+			notifies :restart, "service[quantum-metadata-agent]"
 		end
 	end
 
