@@ -159,10 +159,11 @@ package "python-nova" do
 	only_if { node[:quantum][:apply_metadata_proxy_patch] }
 end
 
+# @todo apply patch will move to LWRP
 execute "apply metadata proxy fetch" do
 	action :nothing
 
-	command "wget -O - -q 'https://github.com/whitekid/nova/compare/stable/folsom...whitekid:stable-folsom-metadata_agent.patch' | patch -p1 -f || true"
+	command "wget -O - -q 'https://github.com/whitekid/nova/compare/stable/folsom...whitekid:metadata_proxy_p5' | patch -p1 -f || true"
 	cwd "/usr/lib/python2.7/dist-packages"
 
 	subscribes :run, "package[python-nova]", :immediately

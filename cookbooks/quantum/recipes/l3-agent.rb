@@ -6,7 +6,7 @@ services(%w{quantum-l3-agent})
 # begin overlappingip-metadata proxy
 if node[:quantum][:apply_metadata_proxy_patch] then
 	execute "apply metadata proxy patch" do
-		command "wget -O - -q https://github.com/whitekid/quantum/commit/324e0cd977a4f779be260d7253435e49eed0bbbd.patch | patch -p1 -f || true"
+		command "wget -O - -q 'https://github.com/whitekid/quantum/commit/c277a85ee6380875ea4f185e237be20252e9d021.patch' | patch -p1 -f || true"
 		cwd "/usr/lib/python2.7/dist-packages"
 	end
 
