@@ -132,50 +132,20 @@ bash "glance db sync" do
 	EOF
 end
 
-# Register Images only apply to qcow2 image
-# http://docs.openstack.org/trunk/openstack-compute/install/apt/content/uploading-to-glance.html
-# http://docs.openstack.org/trunk/openstack-compute/admin/content/starting-images.html
-#
-# Creating raw or QCOW2 images
-# http://docs.openstack.org/trunk/openstack-compute/admin/content/manually-creating-qcow2-images.html
-#
-# @todo md5sum
-images = [
-	# CirrOS QCOW2 image
-	# https://launchpad.net/cirros
-	{
-		"name" => "cirros-0.3.0-x86_64",
-		"url" => "#{repo_node[:repo][:cloud_images][:url]}/cirros/cirros-0.3.0-x86_64-disk.img",
-		"checksum" => "50bdc35edb03a38d91b1b071afb20a3c",
-	},
-	# Ubuntu 12.04 cloud image
-	{
-		"name" => 'ubuntu-12.04-server-cloudimg-amd64',
-		"url" => "#{repo_node[:repo][:cloud_images][:url]}/uec-images/precise/release-20121026.1/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
-		"checksum" => "030a4451f5968ee26d3d75b7759e0d8c",
-	},
-	# Ubuntu 12.10 cloud image
-	{
-		"name" => 'ubuntu-12.10-server-cloudimg-amd64',
-		"url" => "#{repo_node[:repo][:cloud_images][:url]}/uec-images/quantal/release-20121017/ubuntu-12.10-server-cloudimg-amd64-disk1.img",
-		"checksum" => "ba66e7e4f7eb9967fe044c808e92700a",
-	},
-]
-
 # @todo wget이 실패했을때 처리
-images.each do |image|
-	bash "download cloud image: #{image['name']}" do
-		#local_file = "/var/cache/#{File.basename(image["url"])}"
 
+base_url = "#{repo_node[:repo][:cloud_images][:url]}"
+node[:openstack][:cloud_images].each do |image|
+	bash "download cloud image: #{image[:name]}" do
 		code <<-EOF
 		export OS_TENANT_NAME=admin
 		export OS_USERNAME=admin
 		export OS_PASSWORD=#{bag['keystone']['admin_passwd']}
-		export OS_AUTH_URL=http://#{keystone_node['ipaddress']}:35357/v2.0 add
-		glance image-create --name=#{image['name']} --disk-format=qcow2 --container-format=bare --is-public=true --location=#{image['url']}
+		export OS_AUTH_URL=http://#{keystone_node[:ipaddress]}:35357/v2.0 add
+		glance image-create --name='#{image[:name]}' --disk-format=qcow2 --container-format=bare --is-public=true --location="#{base_url}/#{image[:url]}"
 		EOF
 
-		not_if "glance --os-tenant-name=admin --os-username=admin --os-password=#{bag['keystone']['admin_passwd']} --os-auth-url=http://#{keystone_node['ipaddress']}:35357/v2.0 image-list | grep ' #{image['name']} '"
+		not_if "glance --os-tenant-name=admin --os-username=admin --os-password=#{bag['keystone']['admin_passwd']} --os-auth-url=http://#{keystone_node[:ipaddress]}:35357/v2.0 image-list | grep ' #{image[:name]} '"
 	end
 end
 
