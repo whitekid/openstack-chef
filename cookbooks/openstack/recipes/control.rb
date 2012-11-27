@@ -2,6 +2,8 @@
 ::Chef::Recipe.send(:include, Openstack::Helper)
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
+include_recipe "openstack"
+
 bag = data_bag_item('openstack', 'default')
 
 db_node = get_roled_node('openstack-database')
@@ -184,7 +186,7 @@ include_recipe "cinder"
 # nova-services
 #
 package "python-nova" do
-	only_if { node[:openstack][:apply_metadata_proxy_patch] }
+	only_if { node[:quantum][:apply_metadata_proxy_patch] }
 end
 
 execute "apply metadata proxy fetch" do
@@ -194,7 +196,7 @@ execute "apply metadata proxy fetch" do
 	cwd "/usr/lib/python2.7/dist-packages"
 
 	subscribes :run, "package[python-nova]", :immediately
-	only_if { node[:openstack][:apply_metadata_proxy_patch] }
+	only_if { node[:quantum][:apply_metadata_proxy_patch] }
 end
 
 packages(%w{nova-novncproxy novnc nova-api nova-ajax-console-proxy nova-cert nova-consoleauth nova-scheduler})
@@ -222,7 +224,7 @@ template "/etc/nova/nova.conf" do
 		"quantum_tenant_name" => "service",
 		"quantum_user_name" => "quantum",
 		"quantum_user_passwd" => bag["keystone"]["quantum_passwd"],
-		:apply_metadata_proxy_patch => node[:openstack][:apply_metadata_proxy_patch],
+		:apply_metadata_proxy_patch => node[:quantum][:apply_metadata_proxy_patch],
 
 		# @note cinder를 사용하려면 nova-api에서 서비스하는 volume을 제거해야함
 		"enabled_apis" => "ec2,osapi_compute,metadata",
