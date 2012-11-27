@@ -32,6 +32,25 @@ for image in $images; do
 	IMAGES+="$dest,$src "
 done
 
+# rcb
+target="<%= @mirror_dir %>/cloud-images/rcb"
+base="http://c250663.r63.cf1.rackcdn.com/"
+
+images=""
+<% @rcb.each do |img, prop| -%>
+images+="<%= img %>,<%= prop[:md5sum] %> "
+<% end %>
+
+for image in $images; do
+	img=`echo $image | cut -d , -f 1`
+	src="$base/$image"
+	dest="$target/$img"
+
+	IMAGES+="$dest,$src "
+done
+
+
+# do download
 for image in $IMAGES; do
 	dest=`echo "$image" | cut -d , -f 1`
 	src=`echo "$image" | cut -d , -f 2`
@@ -40,7 +59,7 @@ for image in $IMAGES; do
 	mkdir -p `dirname $dest`
 
 	# check md5sum
-	if [ -f $dest ]; then
+	if [ -f "$dest" && ! -z "$md5sum" ]; then
 		if [ "`md5sum $dest | awk '{print \$1}'`" != $md5sum ]; then
 			rm -f $dest
 		fi

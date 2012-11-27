@@ -73,4 +73,11 @@ default['repo']['cloud_images']['uec'] = {
 	},
 }
 
+# https://github.com/rackerjoe/oz-image-build
+default['repo']['cloud_images']['rcb'] = {
+	"centos60_x86_64.qcow2" => {
+		:md5sum => "",
+	},
+}
+
 # vim: nu ai ts=4 sw=4

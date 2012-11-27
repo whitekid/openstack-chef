@@ -94,6 +94,7 @@ template "#{mirror_d}/mirror-cloud-images.sh" do
 		"mirror_dir" => mirror_dir,
 		"cirros" => node['repo']['cloud_images']['cirros'],
 		"uec" => node['repo']['cloud_images']['uec'],
+		"rcb" => node['repo']['cloud_images']['rcb'],
 	})
 end
 
