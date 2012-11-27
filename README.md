@@ -27,3 +27,6 @@ OpenStack Chef cookbooks with
 # patch applied
  * https://review.openstack.org/#/c/14756/ Call iptables without absolute path
  * https://review.openstack.org/#/q/topic:bp/metadata-overlapping-networks,n,z metadata api agent when overlapping_ip
+
+# Note
+ * I'm not chef expert. so chef code is nesty :D
