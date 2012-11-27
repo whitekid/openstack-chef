@@ -72,8 +72,6 @@ if node[:quantum][:apply_metadata_proxy_patch] then
 	# @note 이런 구성이면 management network으로 가야한다.
 	nova_metadata_ip = get_roled_host('openstack-control')
 	metadata_ip = '127.0.0.1'
-else
-	metadata_ip = ''
 end
 
 template "/etc/quantum/l3_agent.ini" do
