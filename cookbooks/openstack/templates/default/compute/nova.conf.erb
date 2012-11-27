@@ -47,7 +47,7 @@ libvirt_vif_driver=<%= @libvirt_vif_driver %>
 volume_api_class=nova.volume.cinder.API
 
 [keystone_authtoken]
-auth_host = <%= @control_host %>
+auth_host = <%= @keystone_host %>
 auth_port = 35357
 auth_protocol = http
 auth_uri = http://<%= @control_host %>:5000/
