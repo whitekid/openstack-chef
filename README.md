@@ -9,7 +9,7 @@ OpenStack Chef cookbooks with
 * pxe boot
 * ubuntu/ centos repository cookbook
 
-# Separated openstack component install
+# Separatly install openstack component
  * database(with rabbitmq-server)
  * keystone
  * controller: glance(api+registry), nova-services(api, vnc, cert, consoleauth, novncproxy, scheduler)
@@ -18,6 +18,7 @@ OpenStack Chef cookbooks with
  * 2 nova-compute node
  * quantum-l3-agent
  * quantum-dhcp-agent
+
 ## and addition component
  * chef-server
  * pxe boot
