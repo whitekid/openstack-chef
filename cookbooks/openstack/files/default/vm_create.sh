@@ -10,6 +10,9 @@ EXTSUBNET=${EXTSUBNET:-10.100.1.128/25}
 # tenant private subnet
 PRISUBNET=${PRISUBNET:-172.16.1.0/24}
 
+WITH_VOLUME=${WITH_VOLUME:-false}
+WITH_FLOATINGIP=${WITH_FLOATINGIP:-false}
+
 set -e
 
 if [ -z "$OS_TENANT_NAME" ]; then
@@ -66,10 +69,13 @@ fi
 #
 # @note with quantum's allow_overlapping_ip option then nova security group does'nt work correctly.
 # that's because nova assumes that vm's IP address are unique
+# so until this bug fixed. we allow all traffic.
 # http://docs.openstack.org/trunk/openstack-network/admin/content/ch_limitations.html
+# https://bugs.launchpad.net/nova/+bug/1053819
 if [ -z "$(nova secgroup-list-rules default)" ]; then
 	nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
-	nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
+	nova secgroup-add-rule default tcp 1 65535 0.0.0.0/0
+	nova secgroup-add-rule default udp 1 65535 0.0.0.0/0
 fi
 
 #
@@ -137,15 +143,19 @@ if [ ! -z "$VM" ]; then
 	echo "PORT=$PORT_ID"
 
 	# create floating ip
-	FLOATINGIP_ID=$(quantum floatingip-create $EXTNET | awk '/ id /{ print $4 }')
-	echo "FLOATINGIP_ID=$FLOATINGIP_ID"
+	if [ $WITH_FLOATINGIP = "true" ]; then
+		FLOATINGIP_ID=$(quantum floatingip-create $EXTNET | awk '/ id /{ print $4 }')
+		echo "FLOATINGIP_ID=$FLOATINGIP_ID"
 
-	# associate floating ip
-	quantum floatingip-associate $FLOATINGIP_ID $PORT_ID
+		# associate floating ip
+		quantum floatingip-associate $FLOATINGIP_ID $PORT_ID
+	fi
 
 	# create cinder volume and attach
-	VOLUME_ID=$(cinder create --display_name=${VM} 1 | awk '/ id /{print $4}')
-	nova volume-attach ${VM_ID} ${VOLUME_ID} /dev/vdb
+	if [ $WITH_VOLUME = "true" ]; then
+		VOLUME_ID=$(cinder create --display_name=${VM} 1 | awk '/ id /{print $4}')
+		nova volume-attach ${VM_ID} ${VOLUME_ID} /dev/vdb
+	fi
 
 	nova show $VM_ID
 fi
