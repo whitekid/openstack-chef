@@ -1,5 +1,5 @@
 #!/bin/bash
-# @todo 부팅하면서 메타데이터 서버에 접속하는데 timeout나는 문제
+set -e
 
 # Image for instance
 IMAGE=${IMAGE:-ubuntu-12.04-server-cloudimg-amd64}
