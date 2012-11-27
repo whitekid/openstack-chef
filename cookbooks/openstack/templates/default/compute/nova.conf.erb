@@ -40,7 +40,7 @@ quantum_auth_strategy=keystone
 quantum_admin_tenant_name=<%= @quantum_tenant_name %>
 quantum_admin_username=<%= @quantum_user_name %>
 quantum_admin_password=<%= @quantum_user_passwd %>
-quantum_admin_auth_url=http://<%= @control_host %>:35357/v2.0
+quantum_admin_auth_url=http://<%= @keystone_host %>:35357/v2.0
 libvirt_vif_driver=<%= @libvirt_vif_driver %>
 
 # cinder
