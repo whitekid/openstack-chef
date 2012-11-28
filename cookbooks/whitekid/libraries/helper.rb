@@ -38,6 +38,10 @@ module Whitekid
 		def iface_addr(node, iface)
 			return node["network"]["interfaces"][iface]["addresses"].select { |address, data| data["family"] == "inet" }[0][0]
 		end
+
+		def get_python_dist_path()
+			return `python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"`.strip
+		end
 	end
 end
 

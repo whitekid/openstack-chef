@@ -46,19 +46,8 @@ use_namespaces = <%= @use_namespaces %>
 # empty value for the linux bridge
 # external_network_bridge = br-ex
 
-# IP address used by Nova metadata server
-metadata_ip = <%= @metadata_ip %>
-<% if @apply_metadata_proxy_patch %>
-nova_metadata_ip = <%= @nova_metadata_ip %>
-<% end %>
-
-
 # TCP Port used by Nova metadata server
-# metadata_port = 8775
+# metadata_port = <%= @metadata_port %>
 
 # The time in seconds between state poll requests
 # polling_interval = 3
-
-<% if @apply_metadata_proxy_patch %>
-state_path = /var/lib/quantum
-<% end %>

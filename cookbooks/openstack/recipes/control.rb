@@ -13,6 +13,7 @@ keystone_node = get_roled_node('keystone-server')
 repo_node = get_roled_node('repo')
 
 # network setup for api-network
+# @todo metadata ip는 api 서버에 연결된 public ip므로 자동으로 알 수 있을 것 같음
 ifconfig bag['metadata_ip'] do
 	device "eth1"
 	mask "255.255.255.0"
@@ -160,14 +161,13 @@ package "python-nova" do
 end
 
 # @todo apply patch will move to LWRP
+python_dist_path = get_python_dist_path
 execute "apply metadata proxy fetch" do
 	action :nothing
-
+	only_if { node[:quantum][:apply_metadata_proxy_patch] }
+	subscribes :run, "package[python-nova]", :immediately
 	command "wget -O - -q 'https://github.com/whitekid/nova/compare/stable/folsom...whitekid:metadata_proxy_p5' | patch -p1 -f || true"
 	cwd "/usr/lib/python2.7/dist-packages"
-
-	subscribes :run, "package[python-nova]", :immediately
-	only_if { node[:quantum][:apply_metadata_proxy_patch] }
 end
 
 packages(%w{nova-novncproxy novnc nova-api nova-ajax-console-proxy nova-cert nova-consoleauth nova-scheduler})

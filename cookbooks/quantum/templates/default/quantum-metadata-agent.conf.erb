@@ -11,4 +11,4 @@ pre-start script
 	chown quantum:root /var/run/quantum
 end script
 
-exec start-stop-daemon --start --chuid quantum --exec /usr/local/bin/quantum-metadata-agent -- --config-file=/etc/quantum/quantum.conf --config-file=/etc/quantum/l3_agent.ini --log-file=/var/log/quantum/metadata-agent.log
+exec start-stop-daemon --start --chuid quantum --exec /usr/local/bin/quantum-metadata-agent -- --config-file=/etc/quantum/quantum.conf --config-file=/etc/quantum/metadata_agent.ini --log-file=/var/log/quantum/metadata-agent.log
