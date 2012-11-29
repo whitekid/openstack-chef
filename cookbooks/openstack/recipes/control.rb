@@ -21,6 +21,7 @@ end
 
 route "172.16.0.0/16" do
 	gateway bag["api_gw"]
+	not_if { node[:quantum][:apply_metadata_proxy_patch] }
 end
 
 

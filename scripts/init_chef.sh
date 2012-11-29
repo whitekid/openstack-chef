@@ -154,7 +154,17 @@ if [ "$vm_create" == "true" ]; then
 	wait_for _nova_compute_up "wait for nova-compute up..." 5
 
 	# launch vm
-	do_ssh $control_ip ". openrc admin ; bin/vm_create.sh test0; until ping -c 3 172.16.1.3; do sleep 3; done"
+	do_ssh $control_ip << EOF
+	. openrc admin
+
+	WITH_FLOATINGIP=true bin/vm_create.sh test0
+
+	ip=\`quantum floatingip-list | head -n 4 | tail -n 1 | awk '{print \$6}'\`
+
+	until ping -c 3 \$ip; do
+		sleep 5;
+	done
+EOF
 fi
 
 # vim: nu ai ts=4 sw=4
