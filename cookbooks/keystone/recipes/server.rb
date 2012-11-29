@@ -2,6 +2,8 @@
 ::Chef::Recipe.send(:include, Openstack::Helper)
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
+include_recipe "keystone::client"
+
 packages(%w{"keystone"})
 services(%w{keystone})
 
