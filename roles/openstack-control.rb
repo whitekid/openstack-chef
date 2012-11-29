@@ -5,6 +5,6 @@ run_list(
     "role[keystone-client]",
     "recipe[openstack::control]",
     "role[quantum-server]",
-    "recipe[cinder::cinder-api]",
-    "recipe[cinder::cinder-scheduler]"
+    "role[cinder-api]",
+    "role[cinder-scheduler]"
 )

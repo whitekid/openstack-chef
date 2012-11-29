@@ -13,6 +13,9 @@ rabbit_pass= <%= @rabbit_passwd %>
 sql_connection = <%= @connection %>
 
 glance_host = <%= @control_host %>
+<% if not @iscsi_ip_address.nil? %>
+iscsi_ip_address = <%= @iscsi_ip_address %>
+<% end %>
 
 osapi_volume_extension = cinder.api.openstack.volume.contrib.standard_extensions
 

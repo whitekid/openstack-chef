@@ -46,6 +46,18 @@ template "/etc/nova/nova.conf" do
 	notifies :restart, "service[nova-compute]"
 end
 
+# ip address for storage
+# @note storage의 address는 eth0 주소에서 2번째 network만 바꾼다. eg) 10.20.1.21 --> 10.130.1.21
+eth0 = iface_addr(node, 'eth0').split('.')
+eth2 = eth0
+eth2[1] = '140'
+eth2 = eth2.join('.')
+
+ifconfig eth2 do
+	device 'eth2'
+	mask '255.255.255.0'
+end
+
 # @todo cgroup_devel_acl 수정
 #template "/etc/libvirt/qemu.conf" do
 #	mode "0644"

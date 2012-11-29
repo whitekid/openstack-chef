@@ -160,8 +160,6 @@ node[:openstack][:cloud_images].each do |image|
 end
 
 
-include_recipe "cinder"
-
 #
 # nova-services
 #
