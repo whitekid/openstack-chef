@@ -53,11 +53,21 @@ end
 # Glance
 #
 package "python-mysqldb"
-%w{glance glance-api glance-common python-glanceclient glance-registry python-glance}.each do | pkg |
-	package pkg do
-		options "--force-yes"
+package "python-glance"
+
+# security paches
+python_dist_path = get_python_dist_path
+
+node[:glance][:patches].each do | patch |
+	execute "apply patche: #{patch}" do
+		action :nothing
+		command "wget -O - -q '#{patch}' | patch -p1"
+		cwd python_dist_path
+		subscribes :run, "package[python-glance]", :immediately
 	end
 end
+
+packages(%w{glance glance-api glance-common python-glanceclient glance-registry python-glance})
 
 services(%w{glance-api glance-registry})
 
