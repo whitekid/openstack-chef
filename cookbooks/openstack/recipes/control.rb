@@ -68,7 +68,6 @@ node[:glance][:patches].each do | patch |
 end
 
 packages(%w{glance glance-api glance-common python-glanceclient glance-registry python-glance})
-
 services(%w{glance-api glance-registry})
 
 template "/etc/glance/glance-api-paste.ini" do
