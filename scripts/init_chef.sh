@@ -129,6 +129,9 @@ for vm in $vms; do
 			required_role='openstack-control'
 			run_list="role[openstack-compute]"
 			;;
+		"horizon.${domain}")
+			run_list="role[horizon]"
+			;;
 		*)
 			run_list="role[openstack-base]"
 			;;
@@ -152,6 +155,9 @@ if [ "$vm_create" == "true" ]; then
 
 	# launch vm
 	do_ssh $control_ip ". openrc admin ; bin/vm_create.sh test0; until ping -c 3 172.16.1.3; do sleep 3; done"
+
+	# ssh to vm
+	do_ssh $control_ip "ssh -i admin.key ubuntu@172.16.1.3"
 fi
 
 # vim: nu ai ts=4 sw=4

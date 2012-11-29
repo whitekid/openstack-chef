@@ -3,6 +3,12 @@
 packages(%w{quantum-l3-agent})
 services(%w{quantum-l3-agent})
 
+# metadata agent fix
+template '/etc/init/quantum-l3-agent.conf' do
+	mode '0644'
+	source 'quantum-l3-agent.conf.erb'
+end
+
 # setup services quantum-metadata-agent services
 template "/etc/init/quantum-metadata-agent.conf" do
 	mode "0644"

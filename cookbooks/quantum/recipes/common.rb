@@ -37,7 +37,7 @@ execute "apply metadata proxy patch" do
 	action :nothing
 	only_if { node[:quantum][:apply_metadata_proxy_patch] }
 	subscribes :run, "package[python-quantum]", :immediately
-	command "wget -O - -q 'https://github.com/whitekid/quantum/compare/stable/folsom...whitekid:metadata_proxy_p7.patch' | patch -p1 -f || true"
+	command "wget -O - -q 'https://github.com/whitekid/quantum/compare/stable/folsom...whitekid:metadata_proxy_p10.patch' | patch -p1 -f || true"
 	cwd python_dist_path
 end
 
