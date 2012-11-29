@@ -7,7 +7,7 @@ if [ -f "$dir/init_chef.rc" ]; then
 fi
 
 vm_revert=${vm_revert:-true}
-vm_snapshot=${vm_snapshot:-os_setup}
+snapshot=${snapshot:-os_setup}
 vm_create=${vm_create:-true}
 chef_bootstrap=${chef_bootstrap:-apt}
 compute_count=${compute_count:-2}
@@ -44,8 +44,8 @@ function _revert_vm() {
 	vm=$1
 
 	v=`echo $vm | cut -d : -f 1`
-	echo "revert $v to snapshot $vm_snapshot"
-	vmrun revertToSnapshot $v $vm_snapshot
+	echo "revert $v to snapshot $snapshot"
+	vmrun revertToSnapshot $v $snapshot
 	sleep 3
 	until vmrun list | grep "$v" > /dev/null ; do
 		echo "starting $v"
@@ -54,7 +54,7 @@ function _revert_vm() {
 	done
 }
 
-function role_settled(){
+function _role_settled(){
 	knife search node roles:$required_role | grep ^IP > /dev/null
 	return $?
 }
@@ -137,7 +137,7 @@ for vm in $vms; do
 			;;
 	esac
 
-	[ ! -z "$required_role" ] && wait_for "role_settled ${required_role}" "waiting role installing ${required_role}..." 5
+	[ ! -z "$required_role" ] && wait_for "_role_settled ${required_role}" "waiting installing ${required_role} role..." 5
 	knife node run_list add "${node}" "${run_list}"
 
 	# reboot to apply chef role
@@ -155,9 +155,6 @@ if [ "$vm_create" == "true" ]; then
 
 	# launch vm
 	do_ssh $control_ip ". openrc admin ; bin/vm_create.sh test0; until ping -c 3 172.16.1.3; do sleep 3; done"
-
-	# ssh to vm
-	do_ssh $control_ip "ssh -i admin.key ubuntu@172.16.1.3"
 fi
 
 # vim: nu ai ts=4 sw=4

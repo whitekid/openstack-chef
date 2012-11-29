@@ -1,5 +1,5 @@
 #vm_revert=true
-#vm_snapshot=os_setup
+#snapshot=os_setup
 #vm_create=false
 #chef_bootstrap=apt
 #compute_count=2
