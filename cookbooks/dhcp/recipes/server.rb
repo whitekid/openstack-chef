@@ -29,8 +29,25 @@ template "/etc/dhcp/dhcpd.conf" do
 	variables({
 		:properties => data_bag_item('hosts', 'default')['properties'],
 		:subnets => data_bag_item('hosts', 'default')['subnets'],
+		:ipaddr => node['ipaddress'],
 	})
 	notifies :restart, resources(:service => "isc-dhcp-server")
 end
+
+
+# simple dns service
+packages(%w"dnsmasq")
+services(%w"dnsmasq")
+
+template '/etc/dnsmasq.d/openstack.zone' do
+	mode '0644'
+	source 'dnsmasq.zone.erb'
+	variables({
+		:properties => data_bag_item('hosts', 'default')['properties'],
+		:subnets => data_bag_item('hosts', 'default')['subnets'],
+	})
+	notifies :restart, 'service[dnsmasq]'
+end
+
 
 # vim: nu ai ts=4 sw=4

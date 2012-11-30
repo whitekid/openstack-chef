@@ -1,6 +1,6 @@
-#vm_revert=true
+#revert=true
 #snapshot=os_setup
-#vm_create=false
+#create_vm=false
 #chef_bootstrap=apt
 #compute_count=2
 
@@ -8,9 +8,9 @@ vm_path="/home/choe/ssd/vmware/openstack"
 vms+="${vm_path}/database/database.vmx:database.choe "
 vms+="${vm_path}/keystone/keystone.vmx:keystone.choe "
 vms+="${vm_path}/control/control.vmx:control.choe "
-vms+="${vm_path}/c-01-01/c-01-01.vmx:c-01-01.choe "
-vms+="${vm_path}/c-01-02/c-01-02.vmx:c-01-02.choe "
+vms+="${vm_path}/cinder-volume/cinder-volume.vmx:c-vol.choe "
 vms+="${vm_path}/net-l3/net-l3.vmx:net-l3.choe "
 vms+="${vm_path}/net-dhcp/net-dhcp.vmx:net-dhcp.choe "
-vms+="${vm_path}/cinder-volume/cinder-volume.vmx:c-vol.choe "
+vms+="${vm_path}/c-01-01/c-01-01.vmx:c-01-01.choe "
+vms+="${vm_path}/c-01-02/c-01-02.vmx:c-01-02.choe "
 vms+="${vm_path}/horizon/horizon.vmx:horizon.choe "

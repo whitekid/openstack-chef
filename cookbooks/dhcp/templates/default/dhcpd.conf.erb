@@ -10,7 +10,7 @@ authoritative;
 allow booting;
 allow bootp;
 option domain-name              "<%= @properties['domain'] %>";
-option domain-name-servers      <%= @properties['dns'] %>;
+option domain-name-servers      <%= @ipaddr %>;
 option time-offset              <%= @properties['tz'] %>;
 option ntp-servers              <%= @properties['ntp'] %>;
 option subnet-mask              <%= @properties['netmask'] %>;

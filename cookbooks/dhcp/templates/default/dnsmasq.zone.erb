@@ -1,0 +1,5 @@
+<% @subnets.each do |subnet| -%>
+        <% subnet['hosts'].each do |host| -%>
+address=/<%= host['hostname'] %>.<%= @properties['domain'] %>/<%= host["ip"] %>
+        <% end %>
+<% end %>

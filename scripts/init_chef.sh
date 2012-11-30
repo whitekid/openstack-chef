@@ -6,9 +6,9 @@ if [ -f "$dir/init_chef.rc" ]; then
 	source "$dir/init_chef.rc"
 fi
 
-vm_revert=${vm_revert:-true}
+revert=${revert:-true}
 snapshot=${snapshot:-os_setup}
-vm_create=${vm_create:-true}
+create_vm=${create_vm:-true}
 chef_bootstrap=${chef_bootstrap:-apt}
 compute_count=${compute_count:-2}
 
@@ -44,9 +44,12 @@ function _revert_vm() {
 	vm=$1
 
 	v=`echo $vm | cut -d : -f 1`
-	echo "revert $v to snapshot $snapshot"
-	vmrun revertToSnapshot $v $snapshot
-	sleep 3
+	if [ "$revert" = "true" ]; then
+		echo "revert $v to snapshot $snapshot"
+		vmrun revertToSnapshot $v $snapshot
+		sleep 3
+	fi
+
 	until vmrun list | grep "$v" > /dev/null ; do
 		echo "starting $v"
 		vmrun start $v
@@ -59,11 +62,9 @@ function _role_settled(){
 	return $?
 }
 
-if [ "$vm_revert" = "true" ]; then
-	for vm in $vms; do
-		_revert_vm $vm
-	done
-fi
+for vm in $vms; do
+	_revert_vm $vm
+done
 
 for vm in $vms; do
 	# bootstrap chef
@@ -146,7 +147,7 @@ done
 
 
 # create test vm
-if [ "$vm_create" == "true" ]; then
+if [ "$create_vm" == "true" ]; then
 	control_ip=$(knife search node roles:openstack-control | awk '/^IP/{print $2}')
 	function _nova_compute_up() {
 		test $(do_ssh $control_ip nova-manage service list 2>&1 | grep nova-compute | grep -c ':-)') -ge "$compute_count"
