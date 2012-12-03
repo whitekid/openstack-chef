@@ -94,7 +94,7 @@ SUBNET_ID=$(quantum net-show $NET_ID | awk "/ subnets / { print \$4 }")
 if [ $SUBNET_ID = "|" ]; then
 	SUBNET_ID=$(quantum subnet-create $NET_ID "${PRISUBNET}" \
 				--tenant_id=$TENANT_ID --name=${PRINET}_subnet \
-				--dns_nameservers list=true 168.126.63.1 8.8.8.8 | \
+				--dns_nameservers list=true 192.168.100.108 168.126.63.1 8.8.8.8 | \
 				awk '/ id / {print $4}')
 fi
 echo "SUBNET=$SUBNET_ID"
