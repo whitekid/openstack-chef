@@ -59,7 +59,7 @@ for image in $IMAGES; do
 	mkdir -p `dirname $dest`
 
 	# check md5sum
-	if [ -f "$dest" && ! -z "$md5sum" ]; then
+	if [[ -f "$dest" && ! -z "$md5sum" ]]; then
 		if [ "`md5sum $dest | awk '{print \$1}'`" != $md5sum ]; then
 			rm -f $dest
 		fi
