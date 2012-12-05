@@ -3,7 +3,7 @@ module Openstack
 		def create_db(dbname, dbuser, dbpass)
 			package "mysql-client"
 
-			rootpw = get_roled_node('openstack-database')['mysql']['server_root_password']
+			rootpw = get_roled_node('openstack-database')[:mysql][:server_root_password]
 			bash "create database #{dbname}" do
 				code <<-EOF
 					mysql -uroot -p#{rootpw} -e 'CREATE DATABASE #{dbname}'

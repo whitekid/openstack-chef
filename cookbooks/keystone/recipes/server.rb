@@ -4,20 +4,20 @@
 
 include_recipe "keystone::client"
 
-packages(%w{"keystone"})
+packages(%w{keystone})
 services(%w{keystone})
 
-node.set_unless['keystone']['admin_token'] = secure_password
+node.set_unless[:keystone][:admin_token] = secure_password
 
 db_node = get_roled_node('openstack-database')
 
-connection = connection_string('keystone', 'keystone', db_node['mysql']['openstack_passwd']['keystone'])
+connection = connection_string(:keystone, :keystone, db_node[:mysql][:openstack_passwd][:keystone])
 template "/etc/keystone/keystone.conf" do
 	mode "0644"
 	source "keystone.conf.erb"
 	variables({
-		"connection" => connection,
-		"admin_token" => node['keystone']['admin_token'],
+		:connection => connection,
+		:admin_token => node[:keystone][:admin_token],
 	})
 
 	# @note: 여기서 재시작하지 않으면 keystone-init에서 오류가 발생함

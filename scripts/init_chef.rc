@@ -5,6 +5,7 @@
 #compute_count=2
 
 vm_path="/home/choe/ssd/vmware/openstack"
+vms+="${vm_path}/syslog/syslog.vmx:syslog.choe "
 vms+="${vm_path}/database/database.vmx:database.choe "
 vms+="${vm_path}/keystone/keystone.vmx:keystone.choe "
 vms+="${vm_path}/control/control.vmx:control.choe "
