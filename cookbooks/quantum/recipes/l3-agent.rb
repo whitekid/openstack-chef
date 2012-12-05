@@ -48,7 +48,6 @@ end
 keystone_host = get_roled_host('keystone-server')
 
 bag = data_bag_item('openstack', 'default')
-#metadata_ip = iface_addr(get_roled_node('openstack-control'), 'eth1')
 metadata_ip = bag['metadata_ip']
 
 # setup interface

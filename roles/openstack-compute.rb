@@ -3,5 +3,6 @@ description ""
 run_list(
     "role[openstack-base]",
     "role[quantum-agent]",
-    "recipe[openstack::compute]"
+    "recipe[nova::common]",
+    "recipe[nova::compute]"
 )

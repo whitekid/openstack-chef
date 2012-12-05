@@ -20,9 +20,13 @@ module Whitekid
 			return get_roled_node(role)[:fqdn]
 		end
 
-		def services(svcs)
+		def services(svcs, &block)
 			svcs.each do | s |
 				service s do
+					if block
+						block.call(self)
+					end
+
 					supports :status => true, :restart => true, :reload => true, :stop => true
 					action [ :enable, :start ]
 				end
@@ -37,6 +41,13 @@ module Whitekid
 
 		def iface_addr(node, iface)
 			return node[:network][:interfaces][iface][:addresses].select { |address, data| data["family"] == "inet" }[0][0]
+		end
+
+		def ipaddr_field_set(addr, field, change_to)
+			addr = addr.split('.')
+			new_addr = addr
+			new_addr[field] = change_to
+			return new_addr.join('.')
 		end
 
 		def get_python_dist_path()

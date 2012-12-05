@@ -13,11 +13,7 @@ rabbit_host = get_roled_host('openstack-rabbitmq')
 # network connectivity
 # eth1: data-networks
 #
-eth0 = iface_addr(node, 'eth0').split('.')
-eth1 = eth0
-eth1[1] = '130'
-eth1 = eth1.join('.')
-
+eth1 = ipaddr_field_set(iface_addr(node, :eth0), 1, 130)
 ifconfig eth1 do
 	device 'eth1'
 	mask '255.255.255.0'

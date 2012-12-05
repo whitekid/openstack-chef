@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "whitekid": ">= 0.0.0"
+  },
+  "version": "0.1.0",
+  "conflicting": {
+  },
+  "maintainer_email": "YOUR_EMAIL",
+  "maintainer": "YOUR_COMPANY_NAME",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "name": "nova",
+  "replacing": {
+  },
+  "groupings": {
+  },
+  "providing": {
+  },
+  "suggestions": {
+  },
+  "recommendations": {
+  },
+  "recipes": {
+  },
+  "attributes": {
+  },
+  "description": "Installs/Configures nova",
+  "platforms": {
+  },
+  "license": "All rights reserved"
+}

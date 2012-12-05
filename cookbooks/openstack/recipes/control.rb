@@ -17,6 +17,7 @@ repo_node = get_roled_node('repo')
 ifconfig bag['metadata_ip'] do
 	device "eth1"
 	mask "255.255.255.0"
+	not_if { node[:quantum][:apply_metadata_proxy_patch] }
 end
 
 route "172.16.0.0/16" do
@@ -161,87 +162,7 @@ node[:openstack][:cloud_images].each do |image|
 end
 
 
-#
-# nova-services
-#
-package "python-nova" do
-	only_if { node[:quantum][:apply_metadata_proxy_patch] }
-end
-
-packages(%w{nova-novncproxy novnc nova-api nova-ajax-console-proxy nova-cert nova-consoleauth nova-scheduler})
-services(%w{nova-api nova-cert nova-consoleauth nova-novncproxy nova-scheduler})
-
-# @todo apply patch will move to LWRP
-python_dist_path = get_python_dist_path
-execute "apply metadata proxy patch" do
-	action :nothing
-	only_if { node[:quantum][:apply_metadata_proxy_patch] }
-	subscribes :run, 'package[python-nova]'
-	command "wget -O - -q 'https://github.com/whitekid/nova/compare/stable/folsom...whitekid:metadata_proxy_p5.patch' | patch -p1 -f || true"
-	cwd python_dist_path
-	notifies :restart, "service[nova-api]"
-end
-
-connection = connection_string(:nova, :nova, db_node[:mysql][:openstack_passwd][:nova])
-
-template "/etc/nova/nova.conf" do
-	mode "0644"
-	owner "nova"
-	group "nova"
-	source "control/nova.conf.erb"
-	variables({
-		:connection => connection,
-		:control_host => control_host,
-		:keystone_host => keystone_node[:fqdn],
-		:service_tenant_name => :service,
-		:service_user_name => :nova,
-		:service_user_passwd => bag["keystone"]["nova_passwd"],
-		:rabbit_host => rabbit_host,
-		:rabbit_passwd => bag['rabbit_passwd'],
-		# quantum
-		# @todo allow_overlapping_ip as quantum-api nodes attribute
-		:network_api_class => "nova.network.quantumv2.api.API",
-		:quantum_tenant_name => :service,
-		:quantum_user_name => :quantum,
-		:quantum_user_passwd => bag["keystone"]["quantum_passwd"],
-		:apply_metadata_proxy_patch => node[:quantum][:apply_metadata_proxy_patch],
-
-		# @note cinder를 사용하려면 nova-api에서 서비스하는 volume을 제거해야함
-		"enabled_apis" => "ec2,osapi_compute,metadata",
-	})
-
-	notifies :run, "bash[nova db sync]", :immediately
-	%w{nova-api nova-cert nova-consoleauth nova-novncproxy nova-scheduler}.each do |svc|
-		notifies :restart, "service[#{svc}]", :immediately
-	end
-end
-
-bash "nova db sync" do
-	code <<-EOF
-	nova-manage db sync
-	EOF
-end
-
-template "/etc/nova/api-paste.ini" do
-	mode "0644"
-	owner "nova"
-	group "nova"
-	source "control/nova_api-paste.ini.erb"
-	variables({
-		:keystone_host => keystone_node[:fqdn],
-		:service_tenant_name => :service,
-		:service_user_name => :nova,
-		:service_user_passwd => bag["keystone"]["nova_passwd"],
-	})
-
-	%w{nova-api}.each do |svc|
-		notifies :restart, "service[#{svc}]", :immediately
-	end
-end
-
-execute "wait for nova-api service startup" do
-	command "timeout 5 sh -c 'until wget http://#{control_host}:8774/ -O /dev/null -q; do sleep 1; done'"
-end
+# all nova things are in nova recipe
 
 
 #

@@ -1,0 +1,31 @@
+{
+  "recommendations": {
+  },
+  "dependencies": {
+    "whitekid": ">= 0.0.0",
+    "openstack": ">= 0.0.0"
+  },
+  "platforms": {
+  },
+  "maintainer": "YOUR_COMPANY_NAME",
+  "providing": {
+  },
+  "license": "All rights reserved",
+  "version": "0.1.0",
+  "maintainer_email": "YOUR_EMAIL",
+  "long_description": "Description\n===========\n\nRequirements\n============\n\nAttributes\n==========\n\nUsage\n=====\n\n",
+  "description": "Installs/Configures quantum",
+  "groupings": {
+  },
+  "replacing": {
+  },
+  "suggestions": {
+  },
+  "name": "quantum",
+  "attributes": {
+  },
+  "recipes": {
+  },
+  "conflicting": {
+  }
+}
