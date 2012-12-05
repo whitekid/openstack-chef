@@ -37,11 +37,11 @@ directory mirror_d do
 	recursive true
 end
 
-node.set['repo']['ubuntu']['pkg_mirror_base'] = "http://#{node['ipaddress']}/apt-mirror"
-node.set['repo']['ubuntu']['url'] = "#{node['repo']['ubuntu']['pkg_mirror_base']}/ftp.daum.net/ubuntu"
-node.set['repo']['ubuntu']['pkg_path'] = "/apt-mirror/ftp.daum.net/ubuntu"
-node.set['repo']['ubuntu']['cloud_archive'] = "#{node['repo']['ubuntu']['pkg_mirror_base']}/ubuntu-cloud.archive.canonical.com/ubuntu"
-node.set['repo']['ubuntu']['chef'] = "#{node['repo']['ubuntu']['pkg_mirror_base']}/apt.opscode.com"
+node.override['repo']['ubuntu']['pkg_mirror_base'] = "http://#{node['fqdn']}/apt-mirror"
+node.override['repo']['ubuntu']['url'] = "#{node['repo']['ubuntu']['pkg_mirror_base']}/ftp.daum.net/ubuntu"
+node.override['repo']['ubuntu']['pkg_path'] = "/apt-mirror/ftp.daum.net/ubuntu"
+node.override['repo']['ubuntu']['cloud_archive'] = "#{node['repo']['ubuntu']['pkg_mirror_base']}/ubuntu-cloud.archive.canonical.com/ubuntu"
+node.override['repo']['ubuntu']['chef'] = "#{node['repo']['ubuntu']['pkg_mirror_base']}/apt.opscode.com"
 
 # Ubuntu pxelinux
 dest = "#{mirror_dir}/ubuntu"
@@ -65,7 +65,7 @@ link "#{www_dir}/mirror/ubuntu" do
 	to "#{mirror_dir}/ubuntu"
 end
 
-node.set['repo']['ubuntu']['pxe_linux_path'] = "/mirror/ubuntu"
+node.override['repo']['ubuntu']['pxe_linux_path'] = "/mirror/ubuntu"
 
 # CentOS 
 package "rsync"
@@ -80,7 +80,7 @@ template "#{mirror_d}/mirror-centos.sh" do
 		"dest" => dest,
 	})
 end
-node.set['repo']['centos']['url'] = "http://#{node['ipaddress']}/mirror/CentOS"
+node.override['repo']['centos']['url'] = "http://#{node['fqdn']}/mirror/CentOS"
 
 link "#{www_dir}/mirror/CentOS" do
 	to "#{mirror_dir}/CentOS"
@@ -102,7 +102,7 @@ link "#{www_dir}/mirror/cloud-images" do
 	to "#{mirror_dir}/cloud-images"
 end
 
-node.set[:repo][:cloud_images][:url] = "http://#{node[:ipaddress]}/mirror/cloud-images"
+node.override[:repo][:cloud_images][:url] = "http://#{node[:fqdn]}/mirror/cloud-images"
 
 
 # crontab

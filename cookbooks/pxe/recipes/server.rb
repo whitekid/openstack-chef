@@ -45,7 +45,7 @@ node[:pxe][:items].each do |item|
 		variables({
 			:id => item[:id],
 			:arch => item[:arch],
-			:ipaddr => node[:ipaddress],
+			:repo_host => node[:fqdn],
 		})
 	end
 
@@ -55,7 +55,7 @@ node[:pxe][:items].each do |item|
 		files = %w{ linux initrd.gz }
 		dir = "install/netboot/ubuntu-installer/#{item[:arch]}"
 
-		url_base = "http://#{repo_node[:ipaddress]}/#{repo_node[:repo][:ubuntu][:pxe_linux_path]}/dists/#{item[:release]}/main/installer-#{item[:arch]}/current/images/netboot/ubuntu-installer/#{item[:arch]}"
+		url_base = "http://#{repo_node[:fqdn]}/#{repo_node[:repo][:ubuntu][:pxe_linux_path]}/dists/#{item[:release]}/main/installer-#{item[:arch]}/current/images/netboot/ubuntu-installer/#{item[:arch]}"
 
 	when 'centos'
 		files = %w{ vmlinuz initrd.img }
@@ -109,7 +109,7 @@ node[:pxe][:items].each do |item|
 			mode "0644"
 			variables({
 				:packages => item[:packages],
-				:repo_host => repo_node[:ipaddress],
+				:repo_host => repo_node[:fqdn],
 				:repo_dir => repo_node[:repo][:ubuntu][:pkg_path],
 			})
 		end

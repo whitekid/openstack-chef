@@ -37,16 +37,16 @@ template "/root/config.yaml" do
 	mode "0644"
 	source "control/config.yaml.erb"
 	variables({
-		"admin_token" => keystone_node['keystone']['admin_token'],
-		"keystone_host" => keystone_node['ipaddress'],
-		"control_host" => control_host,
-		'keystone' => bag['keystone'],
+		:admin_token => keystone_node[:keystone][:admin_token],
+		:keystone_host => keystone_node[:fqdn],
+		:control_host => control_host,
+		:keystone => bag['keystone'],
 	})
 end
 
 execute "keystone setup" do
 	command "python /root/keystone-init.py /root/config.yaml"
-	not_if "keystone --token=#{keystone_node['keystone']['admin_token']} --endpoint http://#{keystone_node['ipaddress']}:35357/v2.0 tenant-list | grep ' admin '"
+	not_if "keystone --token=#{keystone_node[:keystone][:admin_token]} --endpoint http://#{keystone_node[:fqdn]}:35357/v2.0 tenant-list | grep ' admin '"
 end
 
 
@@ -77,7 +77,7 @@ template "/etc/glance/glance-api-paste.ini" do
 	group "glance"
 	source "control/glance-api-paste.ini.erb"
 	variables({
-		"glance_passwd" => bag['keystone']['glance_passwd'],
+		:glance_passwd => bag['keystone']['glance_passwd'],
 	})
 
 	notifies :restart, "service[glance-api]", :immediately
@@ -90,35 +90,35 @@ template "/etc/glance/glance-api.conf" do
 	group "glance"
 	source "control/glance-api.conf.erb"
 	variables({
-		"keystone_host" => keystone_node['ipaddress'],
-		"glance_passwd" => bag['keystone']['glance_passwd'],
-		"rabbit_host" => rabbit_host,
-		"rabbit_passwd" => bag['rabbit_passwd'],
-		"service_tenant_name" => "service",
-		"service_user_name" => "glance",
-		"service_user_passwd" => bag["keystone"]["glance_passwd"],
-		"config_file" => "/etc/glance/glance-api-paste.ini",
-		"flavor" => "keystone",
+		:keystone_host => keystone_node[:fqdn],
+		:glance_passwd => bag['keystone']['glance_passwd'],
+		:rabbit_host => rabbit_host,
+		:rabbit_passwd => bag['rabbit_passwd'],
+		:service_tenant_name => :service,
+		:service_user_name => :glance,
+		:service_user_passwd => bag["keystone"]["glance_passwd"],
+		:config_file => "/etc/glance/glance-api-paste.ini",
+		:flavor => :keystone,
 	})
 
 	notifies :restart, "service[glance-api]", :immediately
 end
 
-connection = connection_string('glance', 'glance', db_node['mysql']['openstack_passwd']['glance'])
+connection = connection_string(:glance, :glance, db_node[:mysql][:openstack_passwd][:glance])
 template "/etc/glance/glance-registry.conf" do
 	mode "0644"
 	owner "glance"
 	group "glance"
 	source "control/glance-registry.conf.erb"
 	variables({
-		"keystone_host" => keystone_node['ipaddress'],
-		"glance_passwd" => bag['keystone']['glance_passwd'],
-		"service_tenant_name" => "service",
-		"service_user_name" => "glance",
-		"service_user_passwd" => bag["keystone"]["glance_passwd"],
-		"connection" => connection,
-		"config_file" => "/etc/glance/glance-api-paste.ini",
-		"flavor" => "keystone",
+		:keystone_host => keystone_node[:fqdn],
+		:glance_passwd => bag['keystone']['glance_passwd'],
+		:service_tenant_name => :service,
+		:service_user_name => :glance,
+		:service_user_passwd => bag["keystone"]["glance_passwd"],
+		:connection => connection,
+		:config_file => "/etc/glance/glance-api-paste.ini",
+		:flavor => :keystone,
 	})
 
 	notifies :restart, "service[glance-registry]", :immediately
@@ -130,7 +130,7 @@ template "/etc/glance/glance-registry-paste.ini" do
 	group "glance"
 	source "control/glance-registry-paste.ini.erb"
 	variables({
-		"pipeline" => "authtoken context registryapp",
+		:pipeline => "authtoken context registryapp",
 	})
 
 	notifies :restart, "service[glance-registry]", :immediately
@@ -152,11 +152,11 @@ node[:openstack][:cloud_images].each do |image|
 		export OS_TENANT_NAME=admin
 		export OS_USERNAME=admin
 		export OS_PASSWORD=#{bag['keystone']['admin_passwd']}
-		export OS_AUTH_URL=http://#{keystone_node[:ipaddress]}:35357/v2.0 add
+		export OS_AUTH_URL=http://#{keystone_node[:fqdn]}:35357/v2.0 add
 		glance image-create --name='#{image[:name]}' --disk-format=qcow2 --container-format=bare --is-public=true --location="#{base_url}/#{image[:url]}"
 		EOF
 
-		not_if "glance --os-tenant-name=admin --os-username=admin --os-password=#{bag['keystone']['admin_passwd']} --os-auth-url=http://#{keystone_node[:ipaddress]}:35357/v2.0 image-list | grep ' #{image[:name]} '"
+		not_if "glance --os-tenant-name=admin --os-username=admin --os-password=#{bag['keystone']['admin_passwd']} --os-auth-url=http://#{keystone_node[:fqdn]}:35357/v2.0 image-list | grep ' #{image[:name]} '"
 	end
 end
 
@@ -182,7 +182,7 @@ execute "apply metadata proxy patch" do
 	notifies :restart, "service[nova-api]"
 end
 
-connection = connection_string('nova', 'nova', db_node['mysql']['openstack_passwd']['nova'])
+connection = connection_string(:nova, :nova, db_node[:mysql][:openstack_passwd][:nova])
 
 template "/etc/nova/nova.conf" do
 	mode "0644"
@@ -190,20 +190,20 @@ template "/etc/nova/nova.conf" do
 	group "nova"
 	source "control/nova.conf.erb"
 	variables({
-		"connection" => connection,
-		"control_host" => control_host,
-		"keystone_host" => keystone_node['ipaddress'],
-		"service_tenant_name" => "service",
-		"service_user_name" => "nova",
-		"service_user_passwd" => bag["keystone"]["nova_passwd"],
-		"rabbit_host" => rabbit_host,
-		"rabbit_passwd" => bag['rabbit_passwd'],
+		:connection => connection,
+		:control_host => control_host,
+		:keystone_host => keystone_node[:fqdn],
+		:service_tenant_name => :service,
+		:service_user_name => :nova,
+		:service_user_passwd => bag["keystone"]["nova_passwd"],
+		:rabbit_host => rabbit_host,
+		:rabbit_passwd => bag['rabbit_passwd'],
 		# quantum
 		# @todo allow_overlapping_ip as quantum-api nodes attribute
-		"network_api_class" => "nova.network.quantumv2.api.API",
-		"quantum_tenant_name" => "service",
-		"quantum_user_name" => "quantum",
-		"quantum_user_passwd" => bag["keystone"]["quantum_passwd"],
+		:network_api_class => "nova.network.quantumv2.api.API",
+		:quantum_tenant_name => :service,
+		:quantum_user_name => :quantum,
+		:quantum_user_passwd => bag["keystone"]["quantum_passwd"],
 		:apply_metadata_proxy_patch => node[:quantum][:apply_metadata_proxy_patch],
 
 		# @note cinder를 사용하려면 nova-api에서 서비스하는 volume을 제거해야함
@@ -228,10 +228,10 @@ template "/etc/nova/api-paste.ini" do
 	group "nova"
 	source "control/nova_api-paste.ini.erb"
 	variables({
-		"keystone_host" => keystone_node['ipaddress'],
-		"service_tenant_name" => "service",
-		"service_user_name" => "nova",
-		"service_user_passwd" => bag["keystone"]["nova_passwd"],
+		:keystone_host => keystone_node[:fqdn],
+		:service_tenant_name => :service,
+		:service_user_name => :nova,
+		:service_user_passwd => bag["keystone"]["nova_passwd"],
 	})
 
 	%w{nova-api}.each do |svc|

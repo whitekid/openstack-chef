@@ -20,8 +20,8 @@ template "/etc/cinder/api-paste.ini" do
 	source "api-paste.ini.erb"
 	variables({
 		:keystone_host => keystone_host,
-		:service_tenant_name => 'service',
-		:service_user_name => 'cinder',
+		:service_tenant_name => :service,
+		:service_user_name => :cinder,
 		:service_user_passwd => bag['keystone']['cinder_passwd'],
 		:cinder_port => 6000,
 	})

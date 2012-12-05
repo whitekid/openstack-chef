@@ -2,4 +2,4 @@ default <%= @id %>
 
 label <%= @id %>
   kernel /images/<%= @id %>/vmlinuz
-  append ksdevice=eth0 load_ramdisk=1 initrd=/images/<%= @id %>/initrd.img network ks=http://<%= @ipaddr %>/ks/<%= @id %>.ks
+  append ksdevice=eth0 load_ramdisk=1 initrd=/images/<%= @id %>/initrd.img network ks=http://<%= @repo_host %>/ks/<%= @id %>.ks

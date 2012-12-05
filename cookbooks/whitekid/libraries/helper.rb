@@ -17,7 +17,7 @@ module Whitekid
 		end
 
 		def get_roled_host(role)
-			return get_roled_node(role)['ipaddress']
+			return get_roled_node(role)[:fqdn]
 		end
 
 		def services(svcs)
@@ -36,7 +36,7 @@ module Whitekid
 		end
 
 		def iface_addr(node, iface)
-			return node["network"]["interfaces"][iface]["addresses"].select { |address, data| data["family"] == "inet" }[0][0]
+			return node[:network][:interfaces][iface][:addresses].select { |address, data| data["family"] == "inet" }[0][0]
 		end
 
 		def get_python_dist_path()
