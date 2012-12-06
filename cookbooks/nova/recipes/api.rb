@@ -1,16 +1,9 @@
 # nova-api services
-include_recipe "nova::common"
-
-packages %w{nova-api}
-services %w{nova-api} do |s|
-	s.subscribes :restart, 'template[nova_conf]'
-end
 
 bag = data_bag_item('openstack', 'default')
 keystone_node = get_roled_node('keystone-server')
 
 # network setup for api-network
-# @todo metadata ip는 api 서버에 연결된 public ip므로 자동으로 알 수 있을 것 같음
 ifconfig bag['metadata_ip'] do
 	device "eth1"
 	mask "255.255.255.0"
@@ -22,8 +15,13 @@ route "172.16.0.0/16" do
 	not_if { node[:quantum][:apply_metadata_proxy_patch] }
 end
 
+packages %w{nova-api}
+services %w{nova-api} do |s|
+	s.subscribes :restart, 'template[nova_conf]'
+end
 
-template "/etc/nova/api-paste.ini" do
+template 'nova_api_paste_conf' do
+	path "/etc/nova/api-paste.ini"
 	mode "0644"
 	owner 'nova'
 	group 'nova'
@@ -34,10 +32,10 @@ template "/etc/nova/api-paste.ini" do
 		:service_user_name => :nova,
 		:service_user_passwd => bag["keystone"]["nova_passwd"],
 	})
-
-	notifies :restart, "service[nova-api]", :immediately
+	notifies :restart, 'service[nova-api]', :immediately
 end
 
+# @note nova-api가 시작하고 서비스가 올라가는데 시간이 걸림
 execute "wait for nova-api service startup" do
 	command "timeout 5 sh -c 'until wget http://#{node[:fqdn]}:8774/ -O /dev/null -q; do sleep 1; done'"
 end

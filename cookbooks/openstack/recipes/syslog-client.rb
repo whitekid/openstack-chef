@@ -3,7 +3,7 @@
 
 #
 # syslog settings
-log_host = node[:openstack][:use_syslog] ? get_roled_host('openstack-syslog') : nil
+log_host = node[:openstack][:use_syslog] ? get_roled_host('openstack-syslog-server') : nil
 
 services %w{rsyslog}
 template '/etc/rsyslog.d/stack.conf' do

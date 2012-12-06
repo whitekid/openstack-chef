@@ -149,6 +149,7 @@ if [ ! -z "$VM" ]; then
 
 		# associate floating ip
 		quantum floatingip-associate $FLOATINGIP_ID $PORT_ID
+		quantum floatingip-show $FLOATINGIP_ID
 	fi
 
 	# create cinder volume and attach

@@ -37,7 +37,7 @@ function wait_for() {
 function sync_clock() {
 	# @note 시간 동기화, 시간이 맞지 않으면 chef-cient가 오류를 낸다.
 	# 그리고 시작할 때 ntpd가 startup하면서 포트를 점유하고 있어서 약간 기다리면서 한다.
-	do_ssh $ip 'until ntpdate -u -b pool.ntp.org; do sheep 3; done; hwclock -w'
+	do_ssh $1 'until ntpdate -u -b 0.kr.pool.ntp.org; do sleep 3; done; hwclock -w'
 }
 
 # restore vm
@@ -59,8 +59,12 @@ function _revert_vm() {
 }
 
 function _role_settled(){
-	knife search node roles:$required_role | grep ^IP > /dev/null
-	return $?
+	local roles=$1
+	for role in $roles; do
+		knife search node "roles:${role}" | grep ^IP > /dev/null || return 1
+	done
+
+	return 0
 }
 
 for vm in $vms; do
@@ -68,46 +72,38 @@ for vm in $vms; do
 done
 
 for vm in $vms; do
+	host=`echo $vm | cut -d : -f 2`
+	knife node delete $host -y || true
+	knife client delete $host -y || true
+done
+
+for vm in $vms; do
 	# bootstrap chef
-	ip=`echo $vm | cut -d : -f 2`
+	host=`echo $vm | cut -d : -f 2`
 
-	wait_for "do_ssh $ip echo 2>&1 > /dev/null" "waiting $ip to boot up..." 5
+	wait_for "do_ssh $host echo -n 2>&1 > /dev/null" "waiting $host to boot up..." 5
 
-	do_ssh $ip rm -rf /etc/chef
-	node="$(do_ssh $ip hostname -f)"
+	do_ssh $host rm -rf /etc/chef
 
-	sync_clock
+	sync_clock $host
 
-	release=$(do_ssh $ip lsb_release -a | grep Release | awk '{print $2}')
+	release=$(do_ssh $host lsb_release -a | grep Release | awk '{print $2}')
 
-	knife node delete $node -y || true
-	knife client delete $node -y || true
+	do_ssh $host '(apt-get purge -y chef; rm -rf /etc/chef)'
 
-	do_ssh $ip '(apt-get purge -y chef; rm -rf /etc/chef)'
-
-	# quantal은 gem 버전으로 설치하면 되고 아래 파일을 추가한다
-	# /etc/init.d/chef-client # 여기에는 경로 수정이 필요함
-	# /etc/default/chef-client
-	knife bootstrap $ip -d ubuntu${release}-apt -xroot -Pchoe --bootstrap-version=0.10 -E $chef_env
-
-	# @note 재시작해야 chef가 클라이언트를 등록한다.
-	sync_clock
-	do_ssh $ip service chef-client restart || true
-
-	wait_for "knife node show $node 2>&1" "waiting $node($ip) to chef register..." 3
-
+	# find roles assign to node
 	run_list=''
 	domain=choe
 	required_role=''
-	case $node in
+	case $host in
 		"syslog.${domain}")
-			run_list="role[openstack-syslog]"
+			run_list="role[openstack-syslog-server]"
 			;;
 		"database.${domain}")
 			run_list="role[openstack-database],role[openstack-rabbitmq]"
 			;;
 		"keystone.${domain}")
-			required_role='openstack-database'
+			required_role='openstack-database openstack-syslog-server'
 			run_list="role[keystone-server]"
 			;;
 		"control.${domain}")
@@ -142,24 +138,34 @@ for vm in $vms; do
 			;;
 	esac
 
-	[ ! -z "$required_role" ] && wait_for "_role_settled ${required_role}" "waiting installing ${required_role} role..." 5
-	knife node run_list add "${node}" "${run_list}"
+	[ ! -z "$required_role" ] && wait_for "_role_settled ${required_role}" "waiting role ${required_role}..." 5
 
-	# reboot to apply chef role
-	do_ssh $ip reboot
+	# @note bootstrap 하면서 run_list를 추가할 수 있지만, 이 경우 bootstrap에서
+	# chef-client가 설정되기까지 기다리기 때문에 다음 작업이 delay된다.
+	# 따라서 bootstrap에서는 chef만 설치한다.
+	# - 중간에 에러가 나면 node도 등록이 안되는 문제가 있다.
+	# - chef-sole로 실행하는군.. 실제 환경과도 약간 다는 문제도
+	knife bootstrap $host -d ubuntu${release}-apt -xroot -Pchoe --bootstrap-version=0.10 -E $chef_env
+
+	wait_for "knife node show $host 2>&1" "waiting $host to chef register..." 3
+	knife node run_list add "${host}" "${run_list}"
+
+	# @note chef를 재시작해서 바로 적용되도록
+	sync_clock $host
+	do_ssh $host service chef-client restart
 done
 
 
 # create test vm
 if [ "$create_vm" == "true" ]; then
-	control_ip=$(knife search node roles:openstack-control | awk '/^IP/{print $2}')
 	function _nova_compute_up() {
-		test $(do_ssh $control_ip nova-manage service list 2>&1 | grep nova-compute | grep -c ':-)') -ge "$compute_count"
+		control_host=$(knife search node roles:openstack-control | awk '/^FQDN/{print $2}')
+		test $(do_ssh $control_host nova-manage service list 2>&1 | grep nova-compute | grep -c ':-)') -ge "$compute_count"
 	}
 	wait_for _nova_compute_up "wait for nova-compute up..." 5
 
 	# launch vm
-	do_ssh $control_ip << EOF
+	do_ssh $control_host << EOF
 	. openrc admin
 
 	WITH_FLOATINGIP=true bin/vm_create.sh test0

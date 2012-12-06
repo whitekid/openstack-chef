@@ -43,6 +43,7 @@ default[:glance][:patches] = [
 ]
 
 
+default[:openstack][:use_syslog] = false
 default[:syslog][:log_path] = '/var/log/stack'
 
 # vim: nu ai ts=4 sw=4

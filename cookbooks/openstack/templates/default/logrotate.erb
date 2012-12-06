@@ -1,0 +1,9 @@
+<% @nodes.each do |n| -%>
+<%= @log_path %>/<%= n[:hostname] %>.log {
+  rotate 12
+  monthly
+  compress
+  missingok
+  notifempty
+}
+<% end %>

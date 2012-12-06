@@ -5,7 +5,7 @@ package "python-keystoneclient"
 python_dist_path = get_python_dist_path
 
 node[:keystone][:patches].each do | patch |
-	execute "apply patche: #{patch}" do
+	execute "apply patch: #{patch}" do
 		action :nothing
 		command "wget -O - -q '#{patch}' | patch -p1"
 		cwd python_dist_path

@@ -23,9 +23,7 @@ module Whitekid
 		def services(svcs, &block)
 			svcs.each do | s |
 				service s do
-					if block
-						block.call(self)
-					end
+					block.call(self) if block
 
 					supports :status => true, :restart => true, :reload => true, :stop => true
 					action [ :enable, :start ]

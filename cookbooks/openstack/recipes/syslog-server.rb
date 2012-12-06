@@ -12,6 +12,7 @@ end
 directory node[:syslog][:log_path]
 
 nodes, _, _ = Chef::Search::Query.new.search(:node, 'name:*')
+nodes = nodes.select{|n| n.has_key?(:hostname) }
 template "/etc/rsyslog.d/stack.conf" do
 	source "rsyslog-stack.conf.erb"
 	variables({
@@ -21,6 +22,13 @@ template "/etc/rsyslog.d/stack.conf" do
 	notifies :restart, 'service[rsyslog]'
 end
 
-# @todo log_rotate
+template '/etc/logrotate.d/stack' do
+	source "logrotate.erb"
+	variables({
+		:log_path => node[:syslog][:log_path],
+		:nodes => nodes,
+	})
+end
+
 
 # vim: nu ai ts=4 sw=4

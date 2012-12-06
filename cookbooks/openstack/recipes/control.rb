@@ -2,8 +2,6 @@
 ::Chef::Recipe.send(:include, Openstack::Helper)
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
-include_recipe "openstack"
-
 bag = data_bag_item('openstack', 'default')
 
 db_node = get_roled_node('openstack-database')
@@ -47,7 +45,7 @@ package "python-glance"
 python_dist_path = get_python_dist_path
 
 node[:glance][:patches].each do | patch |
-	execute "apply patche: #{patch}" do
+	execute "apply patch: #{patch}" do
 		action :nothing
 		command "wget -O - -q '#{patch}' | patch -p1"
 		cwd python_dist_path
