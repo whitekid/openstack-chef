@@ -100,6 +100,9 @@ for vm in $vms; do
 	domain=choe
 	required_role=''
 	case $node in
+		"syslog.${domain}")
+			run_list="role[openstack-syslog]"
+			;;
 		"database.${domain}")
 			run_list="role[openstack-database],role[openstack-rabbitmq]"
 			;;

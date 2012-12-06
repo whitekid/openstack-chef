@@ -81,7 +81,7 @@ template "/etc/glance/glance-api.conf" do
 		:glance_passwd => bag['keystone']['glance_passwd'],
 		:rabbit_host => rabbit_host,
 		:rabbit_passwd => bag['rabbit_passwd'],
-		:use_syslog => node[:glance][:use_syslog],
+		:use_syslog => node[:openstack][:use_syslog],
 		:service_tenant_name => :service,
 		:service_user_name => :glance,
 		:service_user_passwd => bag["keystone"]["glance_passwd"],
@@ -101,7 +101,7 @@ template "/etc/glance/glance-registry.conf" do
 	variables({
 		:keystone_host => keystone_node[:fqdn],
 		:glance_passwd => bag['keystone']['glance_passwd'],
-		:use_syslog => node[:glance][:use_syslog],
+		:use_syslog => node[:openstack][:use_syslog],
 		:service_tenant_name => :service,
 		:service_user_name => :glance,
 		:service_user_passwd => bag["keystone"]["glance_passwd"],

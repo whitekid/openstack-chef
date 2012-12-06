@@ -18,7 +18,7 @@ template "/etc/keystone/keystone.conf" do
 	variables({
 		:connection => connection,
 		:admin_token => node[:keystone][:admin_token],
-		:use_syslog => node[:keystone][:use_syslog],
+		:use_syslog => node[:openstack][:use_syslog],
 	})
 
 	# @note: 여기서 재시작하지 않으면 keystone-init에서 오류가 발생함

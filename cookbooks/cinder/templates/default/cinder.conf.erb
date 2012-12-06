@@ -7,6 +7,7 @@ volume_group = cinder-volumes
 debug = True
 verbose = True
 use_syslog = <%= @use_syslog %>
+syslog_log_facility = LOG_LOCAL0
 auth_strategy = keystone
 state_path = /var/lib/cinder
 

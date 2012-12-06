@@ -35,7 +35,9 @@ module Whitekid
 
 		def packages(pkgs)
 			pkgs.each do |p|
-				package p
+				package p do
+					action :upgrade
+				end
 			end
 		end
 

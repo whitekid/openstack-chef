@@ -1,0 +1,3 @@
+<% @nodes.each do |n| -%>
+:hostname, isequal, "<%= n[:hostname] %>" <%= @log_path %>/<%= n[:hostname] %>.log
+<% end %>
