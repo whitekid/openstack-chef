@@ -12,20 +12,6 @@ rabbit_host = get_roled_host('openstack-rabbitmq')
 keystone_node = get_roled_node('keystone-server')
 repo_node = get_roled_node('repo')
 
-# network setup for api-network
-# @todo metadata ip는 api 서버에 연결된 public ip므로 자동으로 알 수 있을 것 같음
-ifconfig bag['metadata_ip'] do
-	device "eth1"
-	mask "255.255.255.0"
-	not_if { node[:quantum][:apply_metadata_proxy_patch] }
-end
-
-route "172.16.0.0/16" do
-	gateway bag["api_gw"]
-	not_if { node[:quantum][:apply_metadata_proxy_patch] }
-end
-
-
 # create tenants, user, service, endpoints
 package "python-setuptools"
 package "python-yaml"

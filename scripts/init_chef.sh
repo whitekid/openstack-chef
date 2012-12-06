@@ -108,7 +108,7 @@ for vm in $vms; do
 			;;
 		"control.${domain}")
 			required_role='keystone-server'
-			run_list="role[openstack-control]"
+			run_list="role[openstack-control],role[nova-api]"
 			;;
 		"c-vol.${domain}")
 			required_role='openstack-control'
