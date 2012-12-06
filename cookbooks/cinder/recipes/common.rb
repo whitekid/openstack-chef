@@ -35,6 +35,7 @@ template "/etc/cinder/cinder.conf" do
 		:rabbit_host => rabbit_host,
 		:rabbit_passwd => bag['rabbit_passwd'],
 		:rabbit_userid => :guest,
+		:use_syslog => node[:cinder][:use_syslog],
 		:iscsi_ip_address => node[:cinder][:iscsi_ip_address],
 	})
 end

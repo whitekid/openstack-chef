@@ -1,8 +1,9 @@
 #revert=true
 #snapshot=os_setup
 #create_vm=false
-#chef_bootstrap=apt
 #compute_count=2
+#chef_bootstrap=apt
+#chef_env=dev
 
 vm_path="/home/choe/ssd/vmware/openstack"
 vms+="${vm_path}/syslog/syslog.vmx:syslog.choe "

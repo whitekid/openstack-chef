@@ -9,8 +9,9 @@ fi
 revert=${revert:-true}
 snapshot=${snapshot:-os_setup}
 create_vm=${create_vm:-true}
-chef_bootstrap=${chef_bootstrap:-apt}
 compute_count=${compute_count:-2}
+chef_bootstrap=${chef_bootstrap:-apt}
+chef_env=${chef_env:-dev}
 
 function do_ssh(){
 	sshpass -pchoe ssh root@$@
@@ -87,7 +88,7 @@ for vm in $vms; do
 	# quantal은 gem 버전으로 설치하면 되고 아래 파일을 추가한다
 	# /etc/init.d/chef-client # 여기에는 경로 수정이 필요함
 	# /etc/default/chef-client
-	knife bootstrap $ip -d ubuntu${release}-apt -xroot -Pchoe --bootstrap-version=0.10
+	knife bootstrap $ip -d ubuntu${release}-apt -xroot -Pchoe --bootstrap-version=0.10 -E $chef_env
 
 	# @note 재시작해야 chef가 클라이언트를 등록한다.
 	sync_clock

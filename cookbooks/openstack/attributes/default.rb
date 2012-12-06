@@ -42,4 +42,6 @@ default[:glance][:patches] = [
 	'https://github.com/openstack/glance/commit/90bcdc5a89e350a358cf320a03f5afe99795f6f6.patch',
 ]
 
+default[:glance][:use_syslog] = false
+
 # vim: nu ai ts=4 sw=4

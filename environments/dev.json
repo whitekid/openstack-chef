@@ -1,0 +1,27 @@
+{
+  "default_attributes": {
+	"nova":  {
+		"use_syslog": true
+	},
+	"keystone":  {
+		"use_syslog": true
+	},
+	"glance":  {
+		"use_syslog": true
+	},
+	"cinder":  {
+		"use_syslog": true
+	},
+	"quantum":  {
+		"use_syslog": true
+	}
+  },
+  "name": "dev",
+  "override_attributes": {
+  },
+  "chef_type": "environment",
+  "json_class": "Chef::Environment",
+  "cookbook_versions": {
+  },
+  "description": ""
+}

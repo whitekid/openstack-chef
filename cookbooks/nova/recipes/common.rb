@@ -49,6 +49,7 @@ node.override[:nova][:nova_conf_params][:quantum_host] = quantum_host
 node.override[:nova][:nova_conf_params][:quantum_tenant_name] = :service
 node.override[:nova][:nova_conf_params][:quantum_user_name] = :quantum
 node.override[:nova][:nova_conf_params][:quantum_user_passwd] = bag["keystone"]["quantum_passwd"]
+node.override[:nova][:nova_conf_params][:use_syslog] = node[:nova][:use_syslog]
 
 template "nova_conf" do
 	path "/etc/nova/nova.conf"
