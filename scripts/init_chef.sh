@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 dir=`dirname $0`
 if [ -f "$dir/init_chef.rc" ]; then
@@ -143,7 +144,7 @@ for vm in $vms; do
 	# 따라서 bootstrap에서는 chef만 설치한다.
 	# - 중간에 에러가 나면 node도 등록이 안되는 문제가 있다.
 	# - chef-sole로 실행하는군.. 실제 환경과도 약간 다른 문제도
-	knife bootstrap $host -d ubuntu${release}-apt -xroot -Pchoe --bootstrap-version=0.10 -E $chef_env
+	knife bootstrap $host -d ubuntu${release}-apt -xroot -i ${ssh_key} --bootstrap-version=0.10 -E $chef_env
 
 	wait_for "knife node show $host 2>&1" "waiting $host to chef register..." 3
 
