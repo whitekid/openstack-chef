@@ -12,9 +12,10 @@ create_vm=${create_vm:-true}
 compute_count=${compute_count:-2}
 chef_bootstrap=${chef_bootstrap:-apt}
 chef_env=${chef_env:-dev}
+ssh_key=${ssh_key:-~/.ssh/id_rsa.whitekid@gmail.com}
 
 function do_ssh(){
-	sshpass -pchoe ssh root@$@
+	ssh -i ${ssh_key} root@$@
 }
 
 function wait_for() {
@@ -53,8 +54,7 @@ function _revert_vm() {
 
 	until vmrun list | grep "$v" > /dev/null ; do
 		echo "starting $v"
-		vmrun start $v
-		sleep 3
+		timeout 10 vmrun start $v || true
 	done
 }
 
@@ -138,21 +138,22 @@ for vm in $vms; do
 			;;
 	esac
 
-	[ ! -z "$required_role" ] && wait_for "_role_settled ${required_role}" "waiting role ${required_role}..." 5
-
 	# @note bootstrap 하면서 run_list를 추가할 수 있지만, 이 경우 bootstrap에서
 	# chef-client가 설정되기까지 기다리기 때문에 다음 작업이 delay된다.
 	# 따라서 bootstrap에서는 chef만 설치한다.
 	# - 중간에 에러가 나면 node도 등록이 안되는 문제가 있다.
-	# - chef-sole로 실행하는군.. 실제 환경과도 약간 다는 문제도
+	# - chef-sole로 실행하는군.. 실제 환경과도 약간 다른 문제도
 	knife bootstrap $host -d ubuntu${release}-apt -xroot -Pchoe --bootstrap-version=0.10 -E $chef_env
 
 	wait_for "knife node show $host 2>&1" "waiting $host to chef register..." 3
+
+	[ ! -z "$required_role" ] && wait_for "_role_settled ${required_role}" "waiting role ${required_role}..." 5
+
 	knife node run_list add "${host}" "${run_list}"
 
-	# @note chef를 재시작해서 바로 적용되도록
+	# @note package가 설치되면서 다음 reboot에 적용되는 것들이 있다. 따라서 reboot하는 것이 안전함
 	sync_clock $host
-	do_ssh $host service chef-client restart
+	do_ssh $host reboot
 done
 
 

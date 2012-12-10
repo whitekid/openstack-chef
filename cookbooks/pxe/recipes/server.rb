@@ -51,16 +51,18 @@ node[:pxe][:items].each do |item|
 
 	## copy pxe network installer image
 	case item[:platform]
-	when 'ubuntu'
+	when :ubuntu
 		files = %w{ linux initrd.gz }
 		dir = "install/netboot/ubuntu-installer/#{item[:arch]}"
 
 		url_base = "http://#{repo_node[:fqdn]}/#{repo_node[:repo][:ubuntu][:pxe_linux_path]}/dists/#{item[:release]}/main/installer-#{item[:arch]}/current/images/netboot/ubuntu-installer/#{item[:arch]}"
 
-	when 'centos'
+	when :centos
 		files = %w{ vmlinuz initrd.img }
 		dir = "images/pxeboot"
 		url_base = "#{repo_node[:repo][:centos][:url]}/#{item[:release]}/os/#{item[:arch]}/images/pxeboot"
+	else
+		raise "unsupported platform #{item[:platform]}"
 	end
 
 	files.each do |f|
@@ -91,7 +93,7 @@ node[:pxe][:items].each do |item|
 	directory "#{wwwroot}/ks/"
 
 	case item[:platform]
-	when 'centos' # kickstart for centos
+	when :centos # kickstart for centos
 		template "#{wwwroot}/ks/#{item[:id]}.ks" do
 			source "#{item[:platform]}.ks.erb"
 			mode "0644"
@@ -100,10 +102,14 @@ node[:pxe][:items].each do |item|
 				:release => item[:release],
 				:arch => item[:arch],
 				:packages => item[:packages],
-				:post_script => item[:post_script]
+				:post_script => item[:post_script],
+				:host => node[:fqdn],
+				:rootpw => node[:pxe][:root][:passwd_crypted],
+				:initial_user => node[:pxe][:initial_user][:username],
+				:ssh_key => node[:pxe][:ssh_key],
 			})
 		end
-	when 'ubuntu'	# preceed for ubuntu
+	when :ubuntu	# preceed for ubuntu
 		template "#{wwwroot}/ks/#{item[:id]}.seed" do
 			source "#{item[:platform]}.seed.erb"
 			mode "0644"
@@ -111,10 +117,32 @@ node[:pxe][:items].each do |item|
 				:packages => item[:packages],
 				:repo_host => repo_node[:fqdn],
 				:repo_dir => repo_node[:repo][:ubuntu][:pkg_path],
+				:host => node[:fqdn],
+				:rootpw => node[:pxe][:root][:passwd_crypted],
+				:initial_user => node[:pxe][:initial_user][:username],
+				:initial_user_fullname => node[:pxe][:initial_user][:fullname],
+				:initial_user_passwd => node[:pxe][:initial_user][:passwd_crypted],
+				:ssh_key => node[:pxe][:ssh_key],
 			})
 		end
 	end
 end
 
+# ssh key for root access
+cookbook_file "#{wwwroot}/ks/#{node[:pxe][:ssh_key]}" do
+	source node[:pxe][:ssh_key]
+	mode "0644"
+	not_if { node[:pxe][:ssh_key].nil? }
+end
+
+template "#{wwwroot}/ks/key.sh" do
+	mode "0644"
+	not_if { node[:pxe][:ssh_key].nil? }
+	variables({
+		:initial_user => node[:pxe][:initial_user][:username],
+		:host => node[:fqdn],
+		:ssh_key => node[:pxe][:ssh_key],
+	})
+end
 
 # vim: ts=4 nu sw=4 ai

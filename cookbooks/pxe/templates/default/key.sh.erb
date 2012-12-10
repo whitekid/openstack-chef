@@ -1,0 +1,6 @@
+#
+for user in root <%= @initial_user %>; do 
+	home=`grep $user /target/etc/passwd | cut -d : -f 6`
+	mkdir /target/${home}/.ssh
+	wget -O /target/${home}/.ssh/authorized_keys http://<%= @host %>/ks/<%= @ssh_key %>
+done

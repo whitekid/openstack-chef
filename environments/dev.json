@@ -2,6 +2,9 @@
   "default_attributes": {
 	"openstack":  {
 		"use_syslog": true
+	},
+	"pxe": {
+		"ssh_key": "id_rsa.whitekid@gmail.com.pub"
 	}
   },
   "name": "dev",

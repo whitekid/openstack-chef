@@ -16,9 +16,7 @@ route "172.16.0.0/16" do
 end
 
 packages %w{nova-api}
-services %w{nova-api} do |s|
-	s.subscribes :restart, 'template[nova_conf]'
-end
+services %w{nova-api}
 
 template 'nova_api_paste_conf' do
 	path "/etc/nova/api-paste.ini"
@@ -33,11 +31,6 @@ template 'nova_api_paste_conf' do
 		:service_user_passwd => bag["keystone"]["nova_passwd"],
 	})
 	notifies :restart, 'service[nova-api]', :immediately
-end
-
-# @note nova-api가 시작하고 서비스가 올라가는데 시간이 걸림
-execute "wait for nova-api service startup" do
-	command "timeout 5 sh -c 'until wget http://#{node[:fqdn]}:8774/ -O /dev/null -q; do sleep 1; done'"
 end
 
 # vim: nu ai ts=4 sw=4
