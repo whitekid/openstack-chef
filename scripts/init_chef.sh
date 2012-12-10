@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-set -x
 
 dir=`dirname $0`
 if [ -f "$dir/init_chef.rc" ]; then
