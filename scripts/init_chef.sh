@@ -152,7 +152,6 @@ for vm in $vms; do
 	knife node run_list add "${host}" "${run_list}"
 
 	# @note package가 설치되면서 다음 reboot에 적용되는 것들이 있다. 따라서 reboot하는 것이 안전함
-	sync_clock $host
 	do_ssh $host reboot
 done
 
