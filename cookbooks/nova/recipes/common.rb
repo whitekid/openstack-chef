@@ -26,6 +26,14 @@ execute "apply metadata proxy patch" do
 	cwd python_dist_path
 end
 
+# security patches
+execute "CVE-2012-5625 : Information Leak In Libvirt LVM-Backed" do
+	action :nothing
+	subscribes :run, 'package[python-nova]', :immediately
+	command "wget -O - -q 'https://github.com/openstack/nova/commit/a99a802e008eed18e39fc1d98170edc495cbd354.patch' | patch -p1"
+	cwd python_dist_path
+end
+
 package "nova-common"
 
 connection = connection_string(:nova, :nova, db_node[:mysql][:openstack_passwd][:nova])

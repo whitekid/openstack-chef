@@ -164,7 +164,7 @@ if [ "$create_vm" == "true" ]; then
 	}
 	wait_for _nova_compute_up "wait for nova-compute up..." 5
 
-	# launch vm
+	# launch vm and check connection
 	do_ssh $control_host << EOF
 	. openrc admin
 

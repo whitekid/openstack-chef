@@ -37,9 +37,6 @@ default[:openstack][:cloud_images] = [
 
 # patches
 default[:glance][:patches] = [
-	# http://secstack.org/2012/11/cve-2012-4573-cve-2012-5482-authentication-bypass-for-image-deletion/
-	'https://github.com/openstack/glance/commit/b591304b8980d8aca8fa6cda9ea1621aca000c88.patch',
-	'https://github.com/openstack/glance/commit/90bcdc5a89e350a358cf320a03f5afe99795f6f6.patch',
 ]
 
 
