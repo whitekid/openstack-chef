@@ -54,7 +54,7 @@ function _revert_vm() {
 
 	until vmrun list | grep "$v" > /dev/null ; do
 		echo "starting $v"
-		timeout 10 vmrun start $v || true
+		timeout 10 vmrun start $v nogui || true
 	done
 }
 
