@@ -4,7 +4,7 @@ module Whitekid
 			result, _, _ = Chef::Search::Query.new.search(:node, "roles:#{role}")
 
 			if result.length == 0 
-				if node["roles"].include?(role):
+				if node["roles"].include?(role)
 					return node	# this node
 				end
 

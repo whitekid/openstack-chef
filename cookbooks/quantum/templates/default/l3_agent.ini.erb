@@ -46,8 +46,11 @@ use_namespaces = <%= @use_namespaces %>
 # empty value for the linux bridge
 # external_network_bridge = br-ex
 
+# IP address used by Nova metadata server
+metadata_ip = <%= @metadata_ip %>
+
 # TCP Port used by Nova metadata server
-# metadata_port = <%= @metadata_port %>
+metadata_port = <%= @metadata_port %>
 
 # The time in seconds between state poll requests
 # polling_interval = 3

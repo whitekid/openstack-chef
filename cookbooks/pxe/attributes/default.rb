@@ -27,10 +27,13 @@ default[:pxe][:items] = [
 ]
 
 # users
-default[:pxe][:root][:passwd_crypted] = 'b5aa09132da3f90af282a3b958c4030c'
+# password generate with
+# printf "r00tme" | mkpasswd -s -m md5
+
+default[:pxe][:root][:passwd_crypted] = '$1$gzqKDP3L$ZwGO4CUbx.I2hahu65r82.'
 default[:pxe][:initial_user][:username] = 'choe'
 default[:pxe][:initial_user][:full_name] = 'Choe, Cheng-Dae'
-default[:pxe][:initial_user][:passwd_crypted] = 'b5aa09132da3f90af282a3b958c4030c'
+default[:pxe][:initial_user][:passwd_crypted] = '$1$gzqKDP3L$ZwGO4CUbx.I2hahu65r82.'
 
 # ssh public key
 default[:pxe][:ssh_key] = nil

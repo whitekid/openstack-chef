@@ -3,6 +3,7 @@ set -e
 
 # Image for instance
 IMAGE=${IMAGE:-ubuntu-12.04-server-cloudimg-amd64}
+#IMAGE=${IMAGE:-cirros-0.3.0-x86_64}
 
 # external subnet
 EXTSUBNET=${EXTSUBNET:-10.100.1.128/25}

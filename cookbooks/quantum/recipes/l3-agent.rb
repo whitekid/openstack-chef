@@ -61,9 +61,15 @@ execute "ovs-vsctl -- --may-exist add-br br-ex"
 execute "ovs-vsctl -- --may-exist add-port br-ex eth2"
 
 metadata_port = '8775'
+metadata_ip = get_roled_host('openstack-control')
+
 if node[:quantum][:apply_metadata_proxy_patch] then
 	# @note 이런 구성이면 management network으로 가야한다.
-	nova_metadata_ip = get_roled_host('openstack-control')
+	nova_metadata_ip = metadata_ip
+	nova_metadata_port = metadata_port
+
+	# @note metadata proxy patch를 적용하면 l3 namespace에서 9697 port에서
+	# namespace proxy가 listen하므로 여기로 던진다.
 	metadata_ip = '127.0.0.1'
 	metadata_port = '9697'
 end
@@ -75,6 +81,7 @@ template "/etc/quantum/l3_agent.ini" do
 	source "l3_agent.ini.erb"
 	variables({
 		:keystone_host => keystone_host,
+		:metadata_ip => metadata_ip,
 		:metadata_port => metadata_port,
 		:region => :RegionOne,
 		:service_tenant_name => :service,

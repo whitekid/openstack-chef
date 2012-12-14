@@ -17,21 +17,24 @@ package "python-nova" do
 end
 
 # @todo apply patch will move to LWRP
+# @note original patch https://github.com/openstack/nova/commit/78c3bb8800c3345553bab3229e29d3797579ee6a
 python_dist_path = get_python_dist_path
 execute "apply metadata proxy patch" do
 	action :nothing
 	only_if { node[:quantum][:apply_metadata_proxy_patch] }
-	subscribes :run, 'package[python-nova]', :immediately
+	subscribes :run, resources(:package => 'python-nova'), :immediately
 	command "wget -O - -q 'https://github.com/whitekid/nova/compare/stable/folsom...whitekid:metadata_proxy.patch' | patch -p1 -f || true"
 	cwd python_dist_path
 end
 
 # security patches
-execute "CVE-2012-5625 : Information Leak In Libvirt LVM-Backed" do
-	action :nothing
-	subscribes :run, 'package[python-nova]', :immediately
-	command "wget -O - -q 'https://github.com/openstack/nova/commit/a99a802e008eed18e39fc1d98170edc495cbd354.patch' | patch -p1"
-	cwd python_dist_path
+node[:nova][:patches].each do |patch|
+	execute "apply patch #{patch}" do
+		action :nothing
+		subscribes :run, resources(:package => 'python-nova'), :immediately
+		command "wget -O - -q '#{patch}' | patch -p1"
+		cwd python_dist_path
+	end
 end
 
 package "nova-common"
