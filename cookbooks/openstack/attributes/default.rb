@@ -18,14 +18,14 @@ default[:openstack][:cloud_images] = [
 	# Ubuntu 12.04 cloud image
 	{
 		:name => 'ubuntu-12.04-server-cloudimg-amd64',
-		:url => "uec-images/precise/release-20121026.1/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
-		:checksum => "030a4451f5968ee26d3d75b7759e0d8c",
+		:url => "uec-images/precise/release-20121218/ubuntu-12.04-server-cloudimg-amd64-disk1.img",
+		:checksum => "3f1ec03af4729be7476e2e2205742c68",
 	},
 	# Ubuntu 12.10 cloud image
 	{
 		:name => 'ubuntu-12.10-server-cloudimg-amd64',
 		:url => "uec-images/quantal/release-20121017/ubuntu-12.10-server-cloudimg-amd64-disk1.img",
-		:checksum => "ba66e7e4f7eb9967fe044c808e92700a",
+		:checksum => "d2009bc433fc0fbe65b8796ac411b8c8",
 	},
 	# RCB centos
 	{

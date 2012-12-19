@@ -65,11 +65,11 @@ default['repo']['cloud_images']['cirros'] = {
 }
 
 default['repo']['cloud_images']['uec'] = {
-	"precise/release-20121026.1/ubuntu-12.04-server-cloudimg-amd64-disk1.img" => {
-		:md5sum => "dfb6401423daab8586ca39215a771357",
+	'precise/release-20121218/ubuntu-12.04-server-cloudimg-amd64-disk1.img' => {
+		:md5sum => '3f1ec03af4729be7476e2e2205742c68',
 	},
-	"quantal/release-20121017/ubuntu-12.10-server-cloudimg-amd64-disk1.img" => {
-		:md5sum => "ba66e7e4f7eb9967fe044c808e92700a",
+	'quantal/release-20121218/ubuntu-12.10-server-cloudimg-amd64-disk1.img' => {
+		:md5sum => 'd2009bc433fc0fbe65b8796ac411b8c8',
 	},
 }
 
