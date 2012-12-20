@@ -5,18 +5,6 @@ default['repo']['apt-mirror']['mirrors'] = {
 		%w"deb-i386  precise-0.10 main testing",
 		%w"deb-i386  quantal-0.10 main testing",
 	],
-	'http://ppa.launchpad.net/openstack-ubuntu-testing/folsom-trunk-testing/ubuntu' => [
-		%w"deb-amd64 precise main",
-		%w"deb-i386  precise main",
-		%w"deb-amd64 quantal main",
-		%w"deb-i386  quantal main",
-	],
-	'http://ppa.launchpad.net/openstack-ubuntu-testing/folsom-deps-staging/ubuntu' => [
-		%w"deb-amd64 precise main",
-		%w"deb-i386  precise main",
-		%w"deb-amd64 quantal main",
-		%w"deb-i386  quantal main",
-	],
 	'http://ubuntu-cloud.archive.canonical.com/ubuntu' => [
 		%w"deb-amd64 precise-updates/folsom main",
 		%w"deb-i386  precise-updates/folsom main",
