@@ -22,6 +22,10 @@ default['repo']['apt-mirror']['mirrors'] = {
 		%w"deb-i386  precise-updates/folsom main",
 		%w"deb-amd64 precise-proposed/folsom main",
 		%w"deb-i386  precise-proposed/folsom main",
+		%w"deb-amd64 precise-updates/grizzly main",
+		%w"deb-i386  precise-updates/grizzly main",
+		%w"deb-amd64 precise-proposed/grizzly main",
+		%w"deb-i386  precise-proposed/grizzly main",
 	],
 	'http://ftp.daum.net/ubuntu/' => [
 		%w"deb-amd64 precise           main multiverse universe restricted main/debian-installer",
