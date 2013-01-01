@@ -10,41 +10,20 @@
 
 repo_node = get_roled_node('repo')
 
-# @note 현재 패키지에는 folsom이 들어가 있다.
-# 하지만 testing 패키지 말고는 완전히 테스트 되지 않았음
-#
 # 기본 패키지 사용
 #use_package = :apt
-
-# 테스팅 패키지 사용
-#use_package = :testing
 
 # cloud archive 패키지 사용
 use_package = :cloud_archive
 cloud_archive_version = :folsom
 
 case use_package
-when :testing
-	apt_repository "openstack-folsom-trunk-testing" do
-		uri "http://ppa.launchpad.net/openstack-ubuntu-testing/folsom-trunk-testing/ubuntu #{node['lsb']['codename']}"
-		components ["main"]
-		keyserver "keyserver.ubuntu.com"
-		key "3B6F61A6"
-	end
-
-	apt_repository "openstack-folsom-dep-staging" do
-		uri "http://ppa.launchpad.net/openstack-ubuntu-testing/folsom-deps-staging/ubuntu #{node['lsb']['codename']}"
-		components ["main"]
-		keyserver "keyserver.ubuntu.com"
-		key "3B6F61A6"
-	end
 when :cloud_archive
 	# cloud archive key package
 	package "ubuntu-cloud-keyring"
 
 	apt_repository "openstack-folsom" do
 		#uri "http://ubuntu-cloud.archive.canonical.com/ubuntu #{node['lsb']['codename']}-updates/#{cloud_archive_version}"
-		# @note cloud archive mirroring: see...
 		# @note cloud archive mirroring: see...
 		uri "#{repo_node[:repo][:ubuntu][:cloud_archive]} #{node['lsb']['codename']}-updates/#{cloud_archive_version}"
 		components ["main"]

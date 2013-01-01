@@ -1,0 +1,29 @@
+uid = swift
+gid = swift
+log file = /var/log/rsyncd.log
+pid file = /var/run/rsyncd.pid
+address = 0.0.0.0
+
+[account]
+max connections = 2
+path = <%= @object_path %>
+read only = false
+lock file = /var/lock/swift/account.lock
+
+[container]
+max connections = 2
+path = <%= @object_path %>
+read only = false
+lock file = /var/lock/swift/container.lock
+
+[object]
+max connections = 2
+path = <%= @object_path %>
+read only = false
+lock file = /var/lock/swift/object.lock   
+
+[ring]
+max connections = 2
+path = /etc/swift
+read only = false
+lock file = /var/lock/swift-ring.lock   

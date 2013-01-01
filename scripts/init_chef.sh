@@ -133,6 +133,18 @@ for vm in $vms; do
 		"horizon.${domain}")
 			run_list="role[horizon]"
 			;;
+		"swift-proxy.${domain}")
+			run_list="role[swift-proxy]"
+			;;
+		"swift-container.${domain}")
+			run_list="role[swift-container]"
+			;;
+		"swift-account.${domain}")
+			run_list="role[swift-account]"
+			;;
+		swift-[0-9].${domain})
+			run_list="role[swift-object]"
+			;;
 		*)
 			run_list="role[openstack-base]"
 			;;

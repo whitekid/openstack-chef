@@ -29,10 +29,15 @@
 				{ "hostname": "net-l3",			"mac": "00:50:56:2c:5b:8b",	"ip": "10.20.1.201",	"os": "ubuntu-12.04-amd64" },
 				{ "hostname": "net-dhcp",		"mac": "00:50:56:24:6b:7a",	"ip": "10.20.1.202",	"os": "ubuntu-12.04-amd64" },
 				{ "hostname": "c-01-01",		"mac": "00:0c:29:ec:ad:58",	"ip": "10.20.1.20",		"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "c-01-02",		"mac": "00:0c:29:53:53:f3",	"ip": "10.20.1.21",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "c-01-02",		"mac": "00:0C:29:53:53:F3",	"ip": "10.20.1.21",		"os": "ubuntu-12.04-amd64" },
 				{ "hostname": "horizon",		"mac": "00:50:56:3e:73:37",	"ip": "10.20.1.9",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "swift-proxy",		"mac": "00:50:56:29:03:8A",	"ip": "10.20.1.50",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "swift-account",		"mac": "00:50:56:30:04:54",	"ip": "10.20.1.51",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "swift-container",	"mac": "00:50:56:3e:8d:06",	"ip": "10.20.1.55",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "swift-1",		"mac": "00:50:56:23:80:21",	"ip": "10.20.1.52",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "swift-2",		"mac": "00:50:56:23:8a:fd",	"ip": "10.20.1.53",		"os": "ubuntu-12.04-amd64" },
+				{ "hostname": "swift-3",		"mac": "00:50:56:36:3a:b7",	"ip": "10.20.1.54",		"os": "ubuntu-12.04-amd64" },
 				{ "hostname": "router-ext",		"mac": "00:50:56:3d:42:b3",	"ip": "10.20.1.250",	"os": "ubuntu-12.04-amd64" },
-				{ "hostname": "router-data",	"mac": "00:50:56:25:e3:cd",	"ip": "10.20.1.251",	"os": "ubuntu-12.04-amd64" },
 				{ "hostname": "devstack",		"mac": "00:50:56:38:4c:10",	"ip": "10.20.1.60",		"os": "ubuntu-12.04-amd64" }
 			]
 		},
