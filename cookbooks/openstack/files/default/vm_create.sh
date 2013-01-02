@@ -111,8 +111,13 @@ if [ -z "$ROUTER_ID" ]; then
 fi
 echo "ROUTER=$ROUTER_ID"
 
-quantum router-interface-add $ROUTER_ID $SUBNET_ID || true
-quantum router-gateway-set $ROUTER_ID $EXTNET_ID || true
+# connect router to subnet
+ROUTER_PORT_ID=$(quantum port-list -- --tenant_id=${TENANT_ID} --fixed_ips subnet_id=${SUBNET_ID} --device_owner=network:router_interface | awk '/ip_address/{print $2}')
+if [ -z "$ROUTER_PORT_ID" ]; then
+	quantum router-interface-add $ROUTER_ID $SUBNET_ID
+	quantum router-gateway-set $ROUTER_ID $EXTNET_ID
+fi
+
 
 #
 # generate keypair
