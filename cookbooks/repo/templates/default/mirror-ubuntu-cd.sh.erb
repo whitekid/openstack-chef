@@ -1,0 +1,15 @@
+#!/bin/bash
+# @note i386 패키지는 제외함
+RSYNC_OPT="-azHv --partial --delete --delete-after -P"
+CD_EXCLUDE="\
+  --exclude edubuntu --exclude kubuntu --exclude jigit \
+  --exclude *-netbook-* --exclude *-alternate-* --exclude *-wubi-* \
+  --exclude *-10.04* --exclude *-11.10* --exclude *-8.04* \
+  --exclude *.img --exclude *.zsync --exclude *.list --exclude *.manifest --exclude *.jigdo --exclude *.template \
+"
+
+# mirror pool
+rsync $RSYNC_OPT \
+	$CD_EXCLUDE \
+	<%= @src %> <%= @dest %>
+

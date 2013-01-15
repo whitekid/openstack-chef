@@ -1,0 +1,27 @@
+#!/bin/bash
+# @note i386 패키지는 제외함
+RSYNC_OPT="-azHv --partial --delete --delete-after -P"
+ARC_EXCLUDE="\
+  --exclude binary-powerpc/ --exclude binary-sparc/ \
+  --exclude daily-installer-powerpc/ --exclude daily-installer-sparc/ \
+  --exclude installer-powerpc/ --exclude installer-sparc/ \
+  --exclude *_powerpc.deb --exclude *_powerpc.udeb \
+  --exclude *_sparc.deb --exclude *_sparc.udeb \
+  --exclude Contents-powerpc.gz --exclude Contents-sparc.gz \
+  --exclude pool/**_i386.deb \
+  --exclude pool/**.gz --exclude pool/**.bz2 --exclude pool/**.dsc --exclude pool/**.xz \
+  --exclude pool/**hardy1_amd64.**deb --exclude pool/**natty1_amd64.**deb --exclude pool/**lucid1_amd64.**deb --exclude pool/**oneiric1_amd64.**deb \
+  --exclude dists/hardy** --exclude dists/lucid** --exclude dists/natty** --exclude dists/oneiric** \
+"
+
+# mirror pool
+rsync $RSYNC_OPT \
+	--exclude "indices/" --exclude "dists/" \
+	$ARC_EXCLUDE \
+	<%= @src %> <%= @dest %>
+
+# mirror dist
+rsync $RSYNC_OPT \
+	--exclude "pool/" \
+	$ARC_EXCLUDE \
+	<%= @src %> <%= @dest %>

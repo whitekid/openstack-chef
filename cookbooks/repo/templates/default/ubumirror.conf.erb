@@ -1,0 +1,73 @@
+#
+#   ubumirror.conf - configuration file for the ubumirror scripts.
+#
+
+# Please set the variables below to fit your site.
+# Which email address/user that will receive failure notices.
+EMAIL=root@localhost
+
+# Server's FQDN.
+HOSTNAME=$(hostname -f)
+
+# Bandwidth limit for all mirror scripts - set to 0 for no limit.
+SPEED=0
+
+# UBUARC_DIR is the destination for the base of the archive directory
+# The script won't run if this variable isn't set
+UBUARC_DIR="<%= @arc_dir %>"
+
+# UBUCDI_DIR is the destination for the base of the cdimage directory
+# The script won't run if this variable isn't set
+#UBUCDI_DIR="/srv/mirror/ubuntu-cdimage"
+
+# UBUREL_DIR is the destination for the base of the releases directory
+# The script won't run if this variable isn't set
+#UBUREL_DIR="/srv/mirror/ubuntu-releases"
+
+# UBUPOR_DIR is the destination for the base of the ports directory
+# The script (ubuports) won't run if this variable isn't set
+#UBUPOR_DIR="/srv/mirror/ubuntu-ports"
+
+# LOGDIR is the destination directory of all the logs
+LOGDIR="/var/log/ubumirror/"
+
+# UBU{ARC,CDI,REL}_MIRROR is the rsync path in the form of host::directory/ of the
+#   upstream mirrors where the ubumirror scripts will mirror from.
+UBUARC_MIRROR=<%= @arc_mirror %>::ubuntu/
+UBUCDI_MIRROR=<%= @arc_mirror %>::cdimage/
+UBUREL_MIRROR=rsync.releases.ubuntu.com::releases/
+UBUPOR_MIRROR=ports.ubuntu.com::ubuntu-ports/
+
+# UBUCDI_FLAVOURS is the set of image flavours to pull from UBICDI_MIRROR
+# flavour names must match directory names on the mirror
+UBUCDI_FLAVOURS="\
+  daily daily-live \
+  ubuntu-netbook/daily-live ubuntu-server/daily \
+"
+
+# UBU{ARC,CDI,REL}_EXCLUDE is what things you want to exclude
+UBUARC_EXCLUDE="\
+  --exclude binary-powerpc/ --exclude binary-sparc/ \
+  --exclude daily-installer-powerpc/ --exclude daily-installer-sparc/ \
+  --exclude installer-powerpc/ --exclude installer-sparc/ \
+  --exclude *_powerpc.deb --exclude *_powerpc.udeb \
+  --exclude *_sparc.deb --exclude *_sparc.udeb \
+  --exclude Contents-powerpc.gz --exclude Contents-sparc.gz \
+  --exclude pool/**hardy1_amd64.**deb --exclude pool/**natty1_amd64.**deb --exclude pool/**lucid1_amd64.**deb --exclude pool/**oneiric1_amd64.**deb \
+  --exclude dists/hardy** --exclude dists/lucid** --exclude dists/natty** --exclude dists/oneiric** \
+"
+UBUCDI_EXCLUDE="\
+  --exclude *-powerpc.* --exclude *-sparc.* \
+  --exclude source/ \
+"
+UBUREL_EXCLUDE="\
+  --exclude *-powerpc.* --exclude *-sparc.* \
+"
+UBUPOR_EXCLUDE="\
+  --exclude binary-powerpc/ --exclude binary-sparc/ \
+  --exclude daily-installer-powerpc/ --exclude daily-installer-sparc/ \
+  --exclude installer-powerpc/ --exclude installer-sparc/ \
+  --exclude *_powerpc.deb --exclude *_powerpc.udeb \
+  --exclude *_sparc.deb --exclude *_sparc.udeb \
+  --exclude Contents-powerpc.gz --exclude Contents-sparc.gz \
+"
