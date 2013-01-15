@@ -38,24 +38,31 @@ directory mirror_d do
 end
 
 node.override['repo']['ubuntu']['pkg_mirror_base'] = "http://#{node['fqdn']}/apt-mirror"
-node.override['repo']['ubuntu']['url'] = "#{node['repo']['ubuntu']['pkg_mirror_base']}/ftp.daum.net/ubuntu"
-node.override['repo']['ubuntu']['pkg_path'] = "/apt-mirror/ftp.daum.net/ubuntu"
+node.override['repo']['ubuntu']['pkg_path'] = "/mirror/ubuntu"
 node.override['repo']['ubuntu']['cloud_archive'] = "#{node['repo']['ubuntu']['pkg_mirror_base']}/ubuntu-cloud.archive.canonical.com/ubuntu"
 node.override['repo']['ubuntu']['chef'] = "#{node['repo']['ubuntu']['pkg_mirror_base']}/apt.opscode.com"
 
-# Ubuntu pxelinux
+# Ubuntu archive mirror
+# @todo add ubuarchive to crontab
+package 'rsync'
+
 dest = "#{mirror_dir}/ubuntu"
 directory dest do
 	recursive true
 end
 
-template "#{mirror_d}/mirror-ubuntu-installer.sh" do
-	source "mirror-ubuntu-installer.sh.erb"
-	mode "0755"
+template "#{mirror_d}/mirror-ubuntu.sh" do
+	mode '0755'
+	source 'mirror-ubuntu.sh.erb'
 	variables({
-		"src" => "ftp.kaist.ac.kr::ubuntu",
-		"dest" => dest,
+		:src => 'kr.archive.ubuntu.com::ubuntu',
+		:dest => dest,
 	})
+end
+
+# 이전 호환성을 위해서 link
+link '/var/spool/apt-mirror/mirror/ftp.daum.net' do
+	to dest
 end
 
 directory "#{www_dir}/mirror"
@@ -67,9 +74,26 @@ end
 
 node.override['repo']['ubuntu']['pxe_linux_path'] = "/mirror/ubuntu"
 
-# CentOS 
-package "rsync"
+# ubuntu-cd mirror
+dest = "#{mirror_dir}/ubuntu-cd"
+directory dest do
+	recursive true
+end
 
+template "#{mirror_d}/mirror-ubuntu-cd.sh" do
+	mode '0755'
+	source 'mirror-ubuntu-cd.sh.erb'
+	variables({
+		:src => 'kr.archive.ubuntu.com::ubuntu-cd',
+		:dest => dest,
+	})
+end
+
+link "#{www_dir}/mirror/ubuntu-cd" do
+	to "#{mirror_dir}/ubuntu-cd"
+end
+
+# CentOS 
 dest = "#{mirror_dir}/CentOS"
 directory dest
 template "#{mirror_d}/mirror-centos.sh" do
