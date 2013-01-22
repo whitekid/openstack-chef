@@ -6,13 +6,13 @@ function usage() {
 	echo "`basename $0` screen [session]"
 	echo
 	echo "session"
-	echo "	stack"
+	echo "  andrew"
 	echo "	devstack"
 }
 
 case "$SCREENNAME" in
-	"stack")
-		hosts="pxe/10.20.1.3 chef/10.20.1.5 control/10.20.1.6 network/10.30.1.5 c-01-01/10.30.1.20 c-01-02/10.30.1.21 c-02-01/10.30.1.22 c-02-02/10.30.1.23 sandbox/10.20.1.61"
+	"andrew")
+		hosts="pxe/10.20.1.3 chef/10.20.1.5 control/10.20.1.6 net-l3/10.20.1.201 net-dhcp/10.20.1.202 c-01-01/10.20.1.20 c-01-02/10.20.1.21 c-02-01/10.20.1.22 c-02-02/10.20.1.23" 
 		;;
 	"devstack")
 		hosts="pxe/10.20.1.3 chef/10.20.1.5 control/10.20.1.80 network/10.40.1.80 compute/10.30.1.80"
